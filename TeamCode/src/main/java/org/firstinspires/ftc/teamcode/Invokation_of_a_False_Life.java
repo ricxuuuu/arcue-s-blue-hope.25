@@ -56,21 +56,18 @@ public class Invokation_of_a_False_Life {
         //zero power behaviour
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        //flywheel PID
-        flywheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
     }
 
     public void drive(double axial, double lateral, double yaw) {
 
         // imperfect strafe compensation
-        lateral *= 1.1;
+        lateral *= 1.3;
 
         // mecanum calculations
         double fl = (axial + lateral + yaw);
         double bl = (axial - lateral + yaw);
-        double fr = (axial - lateral - yaw);
-        double br = (axial + lateral - yaw);
+        double fr = (axial + lateral - yaw);
+        double br = (axial - lateral - yaw);
 
         // Normalize wheel powers
         double max = Math.max(1.0,
@@ -82,10 +79,6 @@ public class Invokation_of_a_False_Life {
         backLeft.setPower(bl / max);
         frontRight.setPower(fr / max);
         backRight.setPower(br / max);
-    }
-
-    public void speed_of_flight(double speed) {
-        flywheel.setPower(speed);
     }
 
     //--------------------------------------------------------------------------------------------//

@@ -18,19 +18,30 @@ public class TELEOP_driver_c extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        boolean fly = false;
+        boolean preFly = false;
+
         waitForStart();
 
 
         // Run until the stop button is pressed
         while (opModeIsActive()) {
             double axial = -gamepad1.left_stick_y; // forward/back
-            double lateral = gamepad1.left_stick_x; // strafe
+            double lateral = -gamepad1.left_stick_x; // strafe
             double yaw = gamepad1.right_stick_x; // turn
 
             robot.drive(axial, lateral, yaw);
 
-            if (gamepad1.a) {
-                robot.speed_of_flight(1);
+            boolean flyButton = gamepad1.x;
+            if (flyButton && !preFly) {
+                fly = !fly;
+            }
+            preFly = flyButton;
+
+            if (fly) {
+                robot.flywheel.setPower(1);
+            } else {
+                robot.flywheel.setPower(0);
             }
 
             telemetry.addData("Front Left Power", robot.frontLeft.getPower());
