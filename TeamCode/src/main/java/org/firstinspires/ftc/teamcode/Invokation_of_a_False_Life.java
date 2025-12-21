@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -60,7 +59,34 @@ public class Invokation_of_a_False_Life {
         //flywheel PID
         flywheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-    };
+    }
+
+    public void drive(double axial, double lateral, double yaw) {
+
+        // imperfect strafe compensation
+        lateral *= 1.1;
+
+        // mecanum calculations
+        double fl = (axial + lateral + yaw);
+        double bl = (axial - lateral + yaw);
+        double fr = (axial - lateral - yaw);
+        double br = (axial + lateral - yaw);
+
+        // Normalize wheel powers
+        double max = Math.max(1.0,
+                Math.max(Math.abs(fl),
+                        Math.max(Math.abs(fr),
+                                Math.max(Math.abs(bl), Math.abs(br)))));
+
+        frontLeft.setPower(fl / max);
+        backLeft.setPower(bl / max);
+        frontRight.setPower(fr / max);
+        backRight.setPower(br / max);
+    }
+
+    public void speed_of_flight(double speed) {
+        flywheel.setPower(speed);
+    }
 
     //--------------------------------------------------------------------------------------------//
 
@@ -79,7 +105,7 @@ public class Invokation_of_a_False_Life {
 
         //recalibrate, see 'SensorGoBildaPinpoint' for reasoning.
         pinpoint.resetPosAndIMU();
-    };
+    }
 
 }
 
