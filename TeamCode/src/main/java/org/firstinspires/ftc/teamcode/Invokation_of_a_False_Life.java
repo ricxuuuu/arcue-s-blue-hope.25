@@ -100,5 +100,11 @@ public class Invokation_of_a_False_Life {
         pinpoint.resetPosAndIMU();
     }
 
+    public double getFlywheelRPM() {
+        double ticksPer = 28; //adj for REV ultraplanetary ticks
+        double velocity = flywheel.getVelocity(); //ticks per second
+        return (velocity / ticksPer) * 60.0; //return rotations per minute
+    }
+
 }
 

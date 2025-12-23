@@ -8,7 +8,6 @@ public class TELEOP_driver_c extends LinearOpMode {
 
     private final Invokation_of_a_False_Life robot = new Invokation_of_a_False_Life();
 
-
     @Override
     public void runOpMode() {
         // Initialize robot hardware
@@ -48,6 +47,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             telemetry.addData("Front Right Power", robot.frontRight.getPower());
             telemetry.addData("Back Left Power", robot.backLeft.getPower());
             telemetry.addData("Back Right Power", robot.backRight.getPower());
+            telemetry.addData("fly RPM", robot.getFlywheelRPM());
             telemetry.update();
         }
     }
