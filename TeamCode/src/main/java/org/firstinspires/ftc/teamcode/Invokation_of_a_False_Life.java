@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -10,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
+//--------------------------------------------------imports and packages
 
 public class Invokation_of_a_False_Life {
     //create motor, IMU, servo, etc. objects
@@ -18,7 +21,7 @@ public class Invokation_of_a_False_Life {
     public Servo hood, flicker;
     GoBildaPinpointDriver pinpoint;
 
-    //create static variables to represent the strings, ease of change.
+    //create static variables to represent the config strings
     private static final String FRONT_LEFT = "frontLeft";
     private static final String FRONT_RIGHT = "frontRight";         //change these for config file
     private static final String BACK_LEFT = "backLeft";
@@ -29,7 +32,14 @@ public class Invokation_of_a_False_Life {
     private static final String FLICKER = "flicker";
     private static final String PINPOINT = "pinpoint";
 
-    public void init(HardwareMap hwMap){
+    //create Enum for flicker servo, and assign position
+    public enum flickStates {START,UPWARDS,DOWNWARDS}
+    flickStates flickState = flickStates.START;
+
+    //---------------------- class creation ↑ --- methods ↓ -------
+
+    //initialization methods
+    public void init(@NonNull HardwareMap hwMap){
         //drivetrain
         frontLeft = hwMap.get(DcMotor.class, FRONT_LEFT);
         frontRight = hwMap.get(DcMotor.class, FRONT_RIGHT);
@@ -47,17 +57,37 @@ public class Invokation_of_a_False_Life {
         configurePinpoint();
         pinpoint.setPosition(new Pose2D(DistanceUnit. INCH, 0, 0, AngleUnit. DEGREES, 0));
 
-        //motor directions
+        //motor/servo directions
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         flywheel.setDirection(DcMotor.Direction.REVERSE);
         intake.setDirection(DcMotor.Direction.REVERSE);
+        flicker.setDirection(Servo.Direction.REVERSE);
 
         //zero power behaviour
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
+        flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+    }
+    public void configurePinpoint() {
+        //x-off = how left the forward pod is from the tracking point
+        //y-off = how forward the strafe pod is from the tracking point
+        pinpoint.setOffsets(45.166, 64.957, DistanceUnit.MM);
+
+        //set the encoder type to the gobilda 4-arm pods used on #3.
+        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+
+        //set the directions of the encoders, first the x encoder then the y encoder
+        pinpoint.setEncoderDirections
+                (GoBildaPinpointDriver.EncoderDirection.FORWARD,
+                        GoBildaPinpointDriver.EncoderDirection.FORWARD);
+
+        //recalibrate, see 'SensorGoBildaPinpoint' for reasoning.
+        pinpoint.resetPosAndIMU();
     }
 
+    //action methods
     public void drive(double axial, double lateral, double yaw) {
 
         // imperfect strafe compensation
@@ -81,25 +111,7 @@ public class Invokation_of_a_False_Life {
         backRight.setPower(br / max);
     }
 
-    //--------------------------------------------------------------------------------------------//
-
-    public void configurePinpoint() {
-        //x-off = how left the forward pod is from the tracking point
-        //y-off = how forward the strafe pod is from the tracking point
-        pinpoint.setOffsets(45.166, 64.957, DistanceUnit.MM);
-
-        //set the encoder type to the gobilda 4-arm pods used on #3.
-        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-
-        //set the directions of the encoders, first the x encoder then the y encoder
-        pinpoint.setEncoderDirections
-                (GoBildaPinpointDriver.EncoderDirection.FORWARD,
-                GoBildaPinpointDriver.EncoderDirection.FORWARD);
-
-        //recalibrate, see 'SensorGoBildaPinpoint' for reasoning.
-        pinpoint.resetPosAndIMU();
-    }
-
+    //information acquisition and output methods
     public double getFlywheelRPM() {
         double ticksPer = 28; //adj for REV ultraplanetary ticks
         double velocity = flywheel.getVelocity(); //ticks per second
