@@ -12,6 +12,7 @@ public class TELEOP_driver_c extends LinearOpMode {
     @Override
     public void runOpMode() {
         robot.init(hardwareMap); // Initialize robot hardware
+        boolean is_blue_alliance = false; //to know which alliance you are on
 
         //-----------------------------------------------INTAKE/FLY PREP
         boolean fly = false;
@@ -29,6 +30,15 @@ public class TELEOP_driver_c extends LinearOpMode {
 
         // runs until the stop button is pressed ---------------------------------------------------
         while (opModeIsActive()) {
+            //-----------------------------------------------ALLIANCE PICK
+            if (gamepad1.leftBumperWasPressed()) {
+                is_blue_alliance = true;
+            }
+            if (gamepad1.rightBumperWasPressed()) {
+                is_blue_alliance = false;
+            }
+            //-----------------------------------------------ALLIANCE PICK
+
             //-----------------------------------------------DRIVETRAIN
             double axial = -gamepad1.left_stick_y; // forward/back
             double lateral = -gamepad1.left_stick_x; // strafe
@@ -72,19 +82,19 @@ public class TELEOP_driver_c extends LinearOpMode {
                 case START:
                     if (gamepad1.xWasPressed()) {
                         flickerTime.reset();
-                        robot.flicker.setPosition(1);
+                        robot.flicker.setPosition(1); //go up
                         robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
                     }
                     break;
                 case UPWARDS:
-                    if (flickerTime.seconds() >= 2) {
+                    if (flickerTime.seconds() >= 0.2) {
                         flickerTime.reset();
-                        robot.flicker.setPosition(0);
+                        robot.flicker.setPosition(0); //go down
                         robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
                     }
                     break;
                 case DOWNWARDS:
-                    if (flickerTime.seconds() >= 2) {
+                    if (flickerTime.seconds() >= 0.2) {
                         robot.flickState = Invokation_of_a_False_Life.flickStates.START;
                     }
                     break;
@@ -98,6 +108,11 @@ public class TELEOP_driver_c extends LinearOpMode {
                 robot.flicker.setPosition(0);
             }
             //-----------------------------------------------FLICK SERVO
+
+            //-----------------------------------------------HOOD SERVO
+            //use the function findIdealLaunchAngle to change servo position,
+            //once testing has been done to see what works (will need to graph)
+            //-----------------------------------------------HOOD SERVO
 
             //-----------------------------------------------TELEMETRY
             telemetry.addData("Front Left Power", robot.frontLeft.getPower());

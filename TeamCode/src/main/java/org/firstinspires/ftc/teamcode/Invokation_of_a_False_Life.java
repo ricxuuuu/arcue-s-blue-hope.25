@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
+
 //--------------------------------------------------imports and packages
 
 public class Invokation_of_a_False_Life {
@@ -57,12 +58,12 @@ public class Invokation_of_a_False_Life {
         configurePinpoint();
         pinpoint.setPosition(new Pose2D(DistanceUnit. INCH, 0, 0, AngleUnit. DEGREES, 0));
 
-        //motor/servo directions
+        //motor/servo directions/position
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         flywheel.setDirection(DcMotor.Direction.REVERSE);
         intake.setDirection(DcMotor.Direction.REVERSE);
-        flicker.setDirection(Servo.Direction.REVERSE);
+        flicker.setPosition(0);
 
         //zero power behaviour
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -116,6 +117,21 @@ public class Invokation_of_a_False_Life {
         double ticksPer = 28; //adj for REV ultraplanetary ticks
         double velocity = flywheel.getVelocity(); //ticks per second
         return (velocity / ticksPer) * 60.0; //return rotations per minute
+    }
+
+    public double findIdealLaunchAngle(boolean is_blue_alliance) {
+        double hypotenuse = 0;
+        pinpoint.update();
+
+        if (is_blue_alliance) {
+            hypotenuse = Math.hypot(Math.abs(-61 -pinpoint.getPosX(DistanceUnit.INCH)), Math.abs(58 - pinpoint.getPosY(DistanceUnit.INCH)));
+        } else {
+            hypotenuse = Math.hypot(Math.abs(-61 -pinpoint.getPosX(DistanceUnit.INCH)), Math.abs(-58 - pinpoint.getPosY(DistanceUnit.INCH)));
+        }
+
+        //ADD THE MATH TO FIND IDEAL LAUNCH ANGLE HERE, NEED TESTING TO BE DONE FIRST.
+
+        return hypotenuse;
     }
 
 }
