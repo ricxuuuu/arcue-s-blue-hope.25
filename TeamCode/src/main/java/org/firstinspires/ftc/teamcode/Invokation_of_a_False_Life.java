@@ -2,16 +2,20 @@ package org.firstinspires.ftc.teamcode;
 
 import androidx.annotation.NonNull;
 
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.sun.tools.javac.code.Attribute;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 //--------------------------------------------------imports and packages
 
@@ -37,6 +41,10 @@ public class Invokation_of_a_False_Life {
     public enum flickStates {START,UPWARDS,DOWNWARDS}
     flickStates flickState = flickStates.START;
 
+    Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 0, 0, AngleUnit. DEGREES, 0);
+    Pose f_startingPose = new Pose(0, 0, Math.toRadians(0));
+
+
     //---------------------- class creation ↑ --- methods ↓ -------
 
     //initialization methods
@@ -56,7 +64,7 @@ public class Invokation_of_a_False_Life {
         //IMU
         pinpoint= hwMap.get(GoBildaPinpointDriver.class, PINPOINT);
         configurePinpoint();
-        pinpoint.setPosition(new Pose2D(DistanceUnit. INCH, 0, 0, AngleUnit. DEGREES, 0));
+        pinpoint.setPosition(startingPose);
 
         //motor/servo directions/position
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
@@ -69,6 +77,10 @@ public class Invokation_of_a_False_Life {
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        Follower follower = Constants.createFollower(hwMap);
+        follower.setStartingPose(f_startingPose);
+        follower.updatePose();
 
     }
     public void configurePinpoint() {
@@ -132,6 +144,26 @@ public class Invokation_of_a_False_Life {
         //ADD THE MATH TO FIND IDEAL LAUNCH ANGLE HERE, NEED TESTING TO BE DONE FIRST.
 
         return hypotenuse;
+    }
+
+    public double findIdealGoalAngle(boolean is_blue_alliance) {
+        double angle = 0;
+        pinpoint.update();
+
+        //find angle to point @goal
+        if (is_blue_alliance) {
+            angle = Math.atan2(58 - pinpoint.getPosY(DistanceUnit.INCH), -61 - pinpoint.getPosX(DistanceUnit.INCH));
+        } else {
+            angle = Math.atan2(-58 - pinpoint.getPosY(DistanceUnit.INCH), -61 - pinpoint.getPosX(DistanceUnit.INCH));
+        }
+
+        //find angle robot needs to move
+        angle = angle - pinpoint.getHeading(AngleUnit.RADIANS);
+
+        //normalize angle (e.g. 358deg rotation simplifies to 2deg)
+        angle = Math.atan2(Math.sin(angle), Math.cos(angle));
+
+        return angle;
     }
 
 }
