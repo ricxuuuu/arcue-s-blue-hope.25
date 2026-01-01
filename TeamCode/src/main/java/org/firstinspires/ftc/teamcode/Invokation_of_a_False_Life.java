@@ -15,6 +15,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 //--------------------------------------------------imports and packages
@@ -44,6 +46,8 @@ public class Invokation_of_a_False_Life {
     Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 0, 0, AngleUnit. DEGREES, 0);
     Pose f_startingPose = new Pose(0, 0, Math.toRadians(0));
 
+    private static final Position cameraPosition = new Position(DistanceUnit.MM, 133.6, 80.409, 271.6845, 0); //cam position relative to robot center
+    private static final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, -72.709, 0, 0, 0); //cam orientation relative to straight up
 
     //---------------------- class creation ↑ --- methods ↓ -------
 
@@ -83,10 +87,11 @@ public class Invokation_of_a_False_Life {
         follower.updatePose();
 
     }
+
     public void configurePinpoint() {
         //x-off = how left the forward pod is from the tracking point
         //y-off = how forward the strafe pod is from the tracking point
-        pinpoint.setOffsets(45.166, 64.957, DistanceUnit.MM);
+        pinpoint.setOffsets(119.227, 44.274, DistanceUnit.MM);
 
         //set the encoder type to the gobilda 4-arm pods used on #3.
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
@@ -99,6 +104,7 @@ public class Invokation_of_a_False_Life {
         //recalibrate, see 'SensorGoBildaPinpoint' for reasoning.
         pinpoint.resetPosAndIMU();
     }
+
 
     //action methods
     public void drive(double axial, double lateral, double yaw) {
@@ -124,6 +130,7 @@ public class Invokation_of_a_False_Life {
         backRight.setPower(br / max);
     }
 
+
     //information acquisition and output methods
     public double getFlywheelRPM() {
         double ticksPer = 28; //adj for REV ultraplanetary ticks
@@ -141,7 +148,7 @@ public class Invokation_of_a_False_Life {
             hypotenuse = Math.hypot(Math.abs(-61 -pinpoint.getPosX(DistanceUnit.INCH)), Math.abs(-58 - pinpoint.getPosY(DistanceUnit.INCH)));
         }
 
-        //ADD THE MATH TO FIND IDEAL LAUNCH ANGLE HERE, NEED TESTING TO BE DONE FIRST.
+        //ADD THE MATH/DATA TO FIND IDEAL LAUNCH ANGLE HERE, NEED TESTING TO BE DONE FIRST.
 
         return hypotenuse;
     }
@@ -164,6 +171,10 @@ public class Invokation_of_a_False_Life {
         angle = Math.atan2(Math.sin(angle), Math.cos(angle));
 
         return angle;
+    }
+
+    public void localizeOffVision() {
+
     }
 
 }
