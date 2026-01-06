@@ -44,8 +44,8 @@ public class TELEOP_driver_c extends LinearOpMode {
 
         // runs until the stop button is pressed ---------------------------------------------------
         while (opModeIsActive()) {
-            follower.updatePose();
-            follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13;
+            //follower.updatePose();
+            //follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13;
 
             if (!follower_control) {
 
@@ -61,7 +61,7 @@ public class TELEOP_driver_c extends LinearOpMode {
 
                 //-----------------------------------------------DRIVETRAIN
                 double axial = -gamepad1.left_stick_y; // forward/back
-                double lateral = -gamepad1.left_stick_x; // strafe
+                double lateral = gamepad1.left_stick_x; // strafe
                 double yaw = gamepad1.right_stick_x; // turn
 
                 //drivetrain joystick movement
@@ -139,13 +139,13 @@ public class TELEOP_driver_c extends LinearOpMode {
 
 
                 //-----------------------------------------------BOT HOLD ADJ GOAL
-                if (gamepad1.left_trigger > 0.13) {
-                    follower.turnTo(robot.findIdealGoalAngle(true));
-                }
-                if (gamepad1.right_trigger > 0.13) {
-                    follower.turnTo(robot.findIdealGoalAngle(false));
-                }
-                follower.update();
+               // if (gamepad1.left_trigger > 0.13) {
+                    //follower.turnTo(robot.findIdealGoalAngle(true));
+                //}
+               // if (gamepad1.right_trigger > 0.13) {
+                    //follower.turnTo(robot.findIdealGoalAngle(false));
+                //}
+                //follower.update();
                 //-----------------------------------------------BOT HOLD ADJ GOAL
 
 

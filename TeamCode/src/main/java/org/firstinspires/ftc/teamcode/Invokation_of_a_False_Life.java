@@ -86,15 +86,15 @@ public class Invokation_of_a_False_Life {
     public void configurePinpoint() {
         //x-off = how left the forward pod is from the tracking point
         //y-off = how forward the strafe pod is from the tracking point
-        pinpoint.setOffsets(45.166, 64.957, DistanceUnit.MM);
+        pinpoint.setOffsets(27.854, 119.227, DistanceUnit.MM);
 
         //set the encoder type to the gobilda 4-arm pods used on #3.
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
         //set the directions of the encoders, first the x encoder then the y encoder
         pinpoint.setEncoderDirections
-                (GoBildaPinpointDriver.EncoderDirection.FORWARD,
-                        GoBildaPinpointDriver.EncoderDirection.FORWARD);
+                (GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                        GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
         //recalibrate, see 'SensorGoBildaPinpoint' for reasoning.
         pinpoint.resetPosAndIMU();
@@ -109,8 +109,8 @@ public class Invokation_of_a_False_Life {
         // mecanum calculations
         double fl = (axial + lateral + yaw);
         double bl = (axial - lateral + yaw);
-        double fr = (axial + lateral - yaw);
-        double br = (axial - lateral - yaw);
+        double fr = (axial - lateral - yaw);
+        double br = (axial + lateral - yaw);
 
         // Normalize wheel powers
         double max = Math.max(1.0,
