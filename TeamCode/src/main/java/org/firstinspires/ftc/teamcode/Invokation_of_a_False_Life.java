@@ -21,10 +21,12 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 public class Invokation_of_a_False_Life {
     //create motor, IMU, servo, etc. objects
-    public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
-    public DcMotorEx flywheel, flywheel2;
+    public DcMotor frontLeft, frontRight, backLeft, backRight;
+    public DcMotorEx flywheel, flywheel2, intake;
     public Servo hood, flicker;
     GoBildaPinpointDriver pinpoint;
+
+    public Follower follower;
 
     //create static variables to represent the config strings
     private static final String FRONT_LEFT = "frontLeft";
@@ -58,7 +60,7 @@ public class Invokation_of_a_False_Life {
         //flywheel and intake
         flywheel = hwMap.get(DcMotorEx.class, FLYWHEEL);
         flywheel2 = hwMap.get(DcMotorEx.class, FLYWHEEL2);
-        intake = hwMap.get(DcMotor.class, INTAKE);
+        intake = hwMap.get(DcMotorEx.class, INTAKE);
         //servos
         hood = hwMap.get(Servo.class, HOOD);
         flicker = hwMap.get(Servo.class, FLICKER);
@@ -72,7 +74,7 @@ public class Invokation_of_a_False_Life {
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         flywheel.setDirection(DcMotor.Direction.REVERSE);
-        intake.setDirection(DcMotor.Direction.REVERSE);
+        intake.setDirection(DcMotorEx.Direction.REVERSE);
         flicker.setPosition(0);
 
         //zero power behaviour
@@ -80,7 +82,7 @@ public class Invokation_of_a_False_Life {
 
         flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        Follower follower = Constants.createFollower(hwMap);
+        follower = Constants.createFollower(hwMap);
         follower.setStartingPose(f_startingPose);
         follower.updatePose();
 

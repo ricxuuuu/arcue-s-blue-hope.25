@@ -31,6 +31,7 @@ public class TELEOP_driver_c extends LinearOpMode {
         boolean fly = false;
         boolean in = false;
         boolean out = false;
+        boolean inta_stalled = false;
         boolean follower_control = false;
 
         //start up a timer for flicker use
@@ -44,8 +45,8 @@ public class TELEOP_driver_c extends LinearOpMode {
 
         // runs until the stop button is pressed ---------------------------------------------------
         while (opModeIsActive()) {
-            //follower.updatePose();
-            //follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13;
+            robot.follower.updatePose();
+            follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13;
 
             if (!follower_control) {
 
@@ -141,13 +142,13 @@ public class TELEOP_driver_c extends LinearOpMode {
 
 
                 //-----------------------------------------------BOT HOLD ADJ GOAL
-               // if (gamepad1.left_trigger > 0.13) {
-                    //follower.turnTo(robot.findIdealGoalAngle(true));
-                //}
-               // if (gamepad1.right_trigger > 0.13) {
-                    //follower.turnTo(robot.findIdealGoalAngle(false));
-                //}
-                //follower.update();
+                if (gamepad1.left_trigger > 0.13) {
+                    follower.turnTo(robot.findIdealGoalAngle(true));
+                }
+                if (gamepad1.right_trigger > 0.13) {
+                    follower.turnTo(robot.findIdealGoalAngle(false));
+                }
+                follower.update();
                 //-----------------------------------------------BOT HOLD ADJ GOAL
 
 
