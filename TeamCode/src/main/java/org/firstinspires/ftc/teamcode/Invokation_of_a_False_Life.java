@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 public class Invokation_of_a_False_Life {
     //create motor, IMU, servo, etc. objects
     public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
-    public DcMotorEx flywheel;
+    public DcMotorEx flywheel, flywheel2;
     public Servo hood, flicker;
     GoBildaPinpointDriver pinpoint;
 
@@ -33,6 +33,7 @@ public class Invokation_of_a_False_Life {
     private static final String BACK_RIGHT = "backRight";
     private static final String INTAKE = "intake";
     private static final String FLYWHEEL = "flywheel";
+    private static final String FLYWHEEL2 = "flywheel2";
     private static final String HOOD = "hood";
     private static final String FLICKER = "flicker";
     private static final String PINPOINT = "pinpoint";
@@ -56,6 +57,7 @@ public class Invokation_of_a_False_Life {
         backRight  = hwMap.get(DcMotor.class, BACK_RIGHT);
         //flywheel and intake
         flywheel = hwMap.get(DcMotorEx.class, FLYWHEEL);
+        flywheel2 = hwMap.get(DcMotorEx.class, FLYWHEEL2);
         intake = hwMap.get(DcMotor.class, INTAKE);
         //servos
         hood = hwMap.get(Servo.class, HOOD);
