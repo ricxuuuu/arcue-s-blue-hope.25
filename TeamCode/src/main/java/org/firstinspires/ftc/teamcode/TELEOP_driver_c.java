@@ -16,6 +16,9 @@ import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 
 @TeleOp(name = "TELEOP driver-c", group = "Linear Op-mode")
 public class TELEOP_driver_c extends LinearOpMode {
@@ -143,16 +146,18 @@ public class TELEOP_driver_c extends LinearOpMode {
 
                 //-----------------------------------------------BOT HOLD ADJ GOAL
                 if (gamepad1.left_trigger > 0.13) {
-                    follower.turnTo(robot.findIdealGoalAngle(true));
+                    robot.follower.turnTo(robot.findIdealGoalAngle(true));
                 }
                 if (gamepad1.right_trigger > 0.13) {
-                    follower.turnTo(robot.findIdealGoalAngle(false));
+                    robot.follower.turnTo(robot.findIdealGoalAngle(false));
                 }
-                follower.update();
+                robot.follower.update();
                 //-----------------------------------------------BOT HOLD ADJ GOAL
 
 
             }
+
+            robot.pinpoint.update();
 
             //-----------------------------------------------TELEMETRY
             telemetry.addData("Front Left Power", robot.frontLeft.getPower());
@@ -160,6 +165,9 @@ public class TELEOP_driver_c extends LinearOpMode {
             telemetry.addData("Back Left Power", robot.backLeft.getPower());
             telemetry.addData("Back Right Power", robot.backRight.getPower());
             telemetry.addData("fly RPM", robot.getFlywheelRPM());
+            telemetry.addData("heading", robot.pinpoint.getHeading(AngleUnit.RADIANS));
+            telemetry.addData("X pos", robot.pinpoint.getPosX(DistanceUnit.INCH));
+            telemetry.addData("y pos", robot.pinpoint.getPosY(DistanceUnit.INCH));
             telemetry.update();
             //-----------------------------------------------TELEMETRY
         }

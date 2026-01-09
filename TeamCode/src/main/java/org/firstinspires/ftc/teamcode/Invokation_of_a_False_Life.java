@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import androidx.annotation.NonNull;
-
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -51,7 +49,7 @@ public class Invokation_of_a_False_Life {
     //---------------------- class creation ↑ --- methods ↓ -------
 
     //initialization methods
-    public void init(@NonNull HardwareMap hwMap){
+    public void init(HardwareMap hwMap){
         //drivetrain
         frontLeft = hwMap.get(DcMotor.class, FRONT_LEFT);
         frontRight = hwMap.get(DcMotor.class, FRONT_RIGHT);
@@ -156,16 +154,12 @@ public class Invokation_of_a_False_Life {
 
         //find angle to point @goal
         if (is_blue_alliance) {
-            angle = Math.atan2(58 - pinpoint.getPosY(DistanceUnit.INCH), -61 - pinpoint.getPosX(DistanceUnit.INCH));
+            angle = Math.atan2(64 - pinpoint.getPosY(DistanceUnit.INCH), -64 - pinpoint.getPosX(DistanceUnit.INCH));
+            angle = (-angle + 1.570);
         } else {
-            angle = Math.atan2(-58 - pinpoint.getPosY(DistanceUnit.INCH), -61 - pinpoint.getPosX(DistanceUnit.INCH));
+            angle = Math.atan2(-64 - pinpoint.getPosY(DistanceUnit.INCH), -64 - pinpoint.getPosX(DistanceUnit.INCH));
+            angle = -(6.28 + angle -1.570);
         }
-
-        //find angle robot needs to move
-        angle = angle - pinpoint.getHeading(AngleUnit.RADIANS);
-
-        //normalize angle (e.g. 358deg rotation simplifies to 2deg)
-        angle = Math.atan2(Math.sin(angle), Math.cos(angle));
 
         return angle;
     }
