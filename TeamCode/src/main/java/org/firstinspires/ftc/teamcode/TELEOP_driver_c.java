@@ -35,7 +35,7 @@ public class TELEOP_driver_c extends LinearOpMode {
         boolean fly = false;
         boolean in = false;
         boolean out = false;
-        boolean follower_control = false;
+        boolean follower_control;
 
         //start up a timer for flicker use
         ElapsedTime flickerTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
@@ -51,42 +51,37 @@ public class TELEOP_driver_c extends LinearOpMode {
             robot.follower.updatePose();
             follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13;
 
+
+
+            //-----------------------------------------------DRIVETRAIN
             if (!follower_control) {
 
-                //-----------------------------------------------DRIVETRAIN
+                //-----------------------------------------------MANUAL CONTROL
                 double axial = -gamepad1.left_stick_y; // forward/back
                 double lateral = gamepad1.left_stick_x; // strafe
                 double yaw = gamepad1.right_stick_x; // turn
 
                 //drivetrain joystick movement
                 robot.drive(axial, lateral, yaw);
-                //-----------------------------------------------DRIVETRAIN
-
+                //-----------------------------------------------MANUAL CONTROL
 
             } else {
 
-
                 //-----------------------------------------------BOT HOLD ADJ GOAL
-                if (gamepad1.left_trigger > 0.13) {
+                if (gamepad1.left_trigger > 0.13 && gamepad1.right_trigger < 0.13) {
                     robot.follower.turnTo(robot.findIdealGoalAngle(true));
+                    is_blue_alliance = true;
                 }
-                if (gamepad1.right_trigger > 0.13) {
+                if (gamepad1.right_trigger > 0.13 && gamepad1.left_trigger < 0.13) {
                     robot.follower.turnTo(robot.findIdealGoalAngle(false));
+                    is_blue_alliance = false;
                 }
                 robot.follower.update();
                 //-----------------------------------------------BOT HOLD ADJ GOAL
 
+            }
+            //-----------------------------------------------DRIVETRAIN
 
-            }
-
-            //-----------------------------------------------ALLIANCE PICK
-            if (gamepad1.leftBumperWasPressed()) {
-                is_blue_alliance = true;
-            }
-            if (gamepad1.rightBumperWasPressed()) {
-                is_blue_alliance = false;
-            }
-            //-----------------------------------------------ALLIANCE PICK
 
 
             //-----------------------------------------------INTAKE/FLY
@@ -102,14 +97,19 @@ public class TELEOP_driver_c extends LinearOpMode {
                 out = !out;
                 in = false;
             }
+            if (gamepad1.dpadLeftWasPressed()) {
+                robot.hoodState = Invokation_of_a_False_Life.hoodStates.NEAR;
+            } else if (gamepad1.dpadUpWasPressed()) {
+                robot.hoodState = Invokation_of_a_False_Life.hoodStates.MID;
+            } else if (gamepad1.dpadRightWasPressed()) {
+                robot.hoodState = Invokation_of_a_False_Life.hoodStates.FAR;
+            }
 
             //robot control based off variables
             if (fly) {
-                robot.flywheel.setPower(1);
-                robot.flywheel2.setPower(1);
+                robot.setFlywheelPower(1);
             } else {
-                robot.flywheel.setPower(0);
-                robot.flywheel2.setPower(0);
+                robot.setFlywheelPower(0);
             }
             if (in) {
                 robot.intake.setPower(1);
@@ -118,7 +118,11 @@ public class TELEOP_driver_c extends LinearOpMode {
             } else {
                 robot.intake.setPower(0);
             }
+
+            robot.setHoodPos(robot.hoodState);
             //-----------------------------------------------INTAKE/FLY
+
+
 
             //-----------------------------------------------FLICK SERVO FSM
             switch (robot.flickState) {
@@ -152,17 +156,23 @@ public class TELEOP_driver_c extends LinearOpMode {
             }
             //-----------------------------------------------FLICK SERVO FSM
 
+
+
             //-----------------------------------------------HOOD SERVO AUTO ADJ
             //use the function findIdealLaunchAngle to change servo position,
             //once testing has been done to see what works (will need to graph)
             //-----------------------------------------------HOOD SERVO AUTO ADJ
 
+
+
             //-----------------------------------------------UPDATES
             robot.pinpoint.update();
             //-----------------------------------------------UPDATES
 
+
+
             //-----------------------------------------------TELEMETRY
-            telemetry.addData("---------------------------//", "---*")
+            telemetry.addData("---------------------------//", "---*");
             telemetry.addData("sometimes I get a craving for fruit that", "what~*");
             telemetry.addData("FL_DT-Power", robot.frontLeft.getPower());
             telemetry.addData("FR_DT-Power", robot.frontRight.getPower());

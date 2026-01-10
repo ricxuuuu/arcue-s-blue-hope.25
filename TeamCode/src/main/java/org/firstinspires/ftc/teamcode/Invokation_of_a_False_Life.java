@@ -44,6 +44,9 @@ public class Invokation_of_a_False_Life {
     public enum flickStates {START,UPWARDS,DOWNWARDS}
     flickStates flickState = flickStates.START;
 
+    public enum hoodStates {NEAR, MID, FAR}
+    hoodStates hoodState = hoodStates.NEAR;
+
     Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 0, 0, AngleUnit. DEGREES, 0);
     Pose f_startingPose = PoseConverter.pose2DToPose(startingPose, InvertedFTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
 
@@ -128,6 +131,23 @@ public class Invokation_of_a_False_Life {
         backLeft.setPower(bl / max);
         frontRight.setPower(fr / max);
         backRight.setPower(br / max);
+    }
+
+    public void setFlywheelPower(double power) {
+        flywheel.setPower(power);
+        flywheel2.setPower(power);
+    }
+
+    public void setHoodPos(hoodStates hoodState) {
+        if (hoodState == hoodStates.NEAR) {
+            hood.setPosition(1);
+        }
+        if (hoodState == hoodStates.MID) {
+            hood.setPosition(0.5);
+        }
+        if (hoodState == hoodStates.FAR) {
+            hood.setPosition(0);
+        }
     }
 
     //information acquisition and output methods
