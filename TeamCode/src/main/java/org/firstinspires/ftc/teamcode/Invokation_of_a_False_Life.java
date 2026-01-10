@@ -1,13 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.ftc.InvertedFTCCoordinates;
+import com.pedropathing.ftc.PoseConverter;
+import com.pedropathing.geometry.PedroCoordinates;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.sun.tools.javac.code.Attribute;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -43,8 +45,7 @@ public class Invokation_of_a_False_Life {
     flickStates flickState = flickStates.START;
 
     Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 0, 0, AngleUnit. DEGREES, 0);
-    Pose f_startingPose = new Pose(0, 0, Math.toRadians(0));
-
+    Pose f_startingPose = PoseConverter.pose2DToPose(startingPose, InvertedFTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
 
     //---------------------- class creation ↑ --- methods ↓ -------
 
@@ -74,18 +75,21 @@ public class Invokation_of_a_False_Life {
         flywheel.setDirection(DcMotor.Direction.REVERSE);
         intake.setDirection(DcMotorEx.Direction.REVERSE);
         flicker.setPosition(0);
+        hood.setPosition(1);
 
         //zero power behaviour
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flywheel2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        flywheel2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         follower = Constants.createFollower(hwMap);
         follower.setStartingPose(f_startingPose);
         follower.updatePose();
 
     }
-    public void configurePinpoint() {
+    private void configurePinpoint() {
         //x-off = how left the forward pod is from the tracking point
         //y-off = how forward the strafe pod is from the tracking point
         pinpoint.setOffsets(27.854, 119.227, DistanceUnit.MM);
@@ -138,9 +142,9 @@ public class Invokation_of_a_False_Life {
         pinpoint.update();
 
         if (is_blue_alliance) {
-            hypotenuse = Math.hypot(Math.abs(-61 -pinpoint.getPosX(DistanceUnit.INCH)), Math.abs(58 - pinpoint.getPosY(DistanceUnit.INCH)));
+            hypotenuse = Math.hypot(Math.abs(-64 -pinpoint.getPosX(DistanceUnit.INCH)), Math.abs(-60 - pinpoint.getPosY(DistanceUnit.INCH)));
         } else {
-            hypotenuse = Math.hypot(Math.abs(-61 -pinpoint.getPosX(DistanceUnit.INCH)), Math.abs(-58 - pinpoint.getPosY(DistanceUnit.INCH)));
+            hypotenuse = Math.hypot(Math.abs(-64 -pinpoint.getPosX(DistanceUnit.INCH)), Math.abs(60 - pinpoint.getPosY(DistanceUnit.INCH)));
         }
 
         //ADD THE MATH TO FIND IDEAL LAUNCH ANGLE HERE, NEED TESTING TO BE DONE FIRST.
@@ -154,11 +158,11 @@ public class Invokation_of_a_False_Life {
 
         //find angle to point @goal
         if (is_blue_alliance) {
-            angle = Math.atan2(64 - pinpoint.getPosY(DistanceUnit.INCH), -64 - pinpoint.getPosX(DistanceUnit.INCH));
-            angle = (-angle + 1.570);
+            angle = Math.atan2(-64 - pinpoint.getPosX(DistanceUnit.INCH), -60 - pinpoint.getPosY(DistanceUnit.INCH));
+            angle = (-angle + Math.PI);
         } else {
-            angle = Math.atan2(-64 - pinpoint.getPosY(DistanceUnit.INCH), -64 - pinpoint.getPosX(DistanceUnit.INCH));
-            angle = -(6.28 + angle -1.570);
+            angle = Math.atan2(-64 - pinpoint.getPosX(DistanceUnit.INCH), 60 - pinpoint.getPosY(DistanceUnit.INCH));
+            angle = -(angle -(Math.PI/4));
         }
 
         return angle;

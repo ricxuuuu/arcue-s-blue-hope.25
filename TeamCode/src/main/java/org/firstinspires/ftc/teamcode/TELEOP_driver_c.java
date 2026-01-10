@@ -17,6 +17,7 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
@@ -28,13 +29,12 @@ public class TELEOP_driver_c extends LinearOpMode {
     @Override
     public void runOpMode() {
         robot.init(hardwareMap); // Initialize robot hardware
-        boolean is_blue_alliance = false; //to know which alliance you are on
+        boolean is_blue_alliance = false; //to know which alliance you are on for auto speed/fly
 
         //-----------------------------------------------INTAKE/FLY PREP
         boolean fly = false;
         boolean in = false;
         boolean out = false;
-        boolean inta_stalled = false;
         boolean follower_control = false;
 
         //start up a timer for flicker use
@@ -53,16 +53,6 @@ public class TELEOP_driver_c extends LinearOpMode {
 
             if (!follower_control) {
 
-
-                //-----------------------------------------------ALLIANCE PICK
-                if (gamepad1.leftBumperWasPressed()) {
-                    is_blue_alliance = true;
-                }
-                if (gamepad1.rightBumperWasPressed()) {
-                    is_blue_alliance = false;
-                }
-                //-----------------------------------------------ALLIANCE PICK
-
                 //-----------------------------------------------DRIVETRAIN
                 double axial = -gamepad1.left_stick_y; // forward/back
                 double lateral = gamepad1.left_stick_x; // strafe
@@ -71,74 +61,6 @@ public class TELEOP_driver_c extends LinearOpMode {
                 //drivetrain joystick movement
                 robot.drive(axial, lateral, yaw);
                 //-----------------------------------------------DRIVETRAIN
-
-                //-----------------------------------------------INTAKE/FLY
-                //player manual control of variables
-                if (gamepad1.yWasPressed()) {
-                    fly = !fly;
-                }
-                if (gamepad1.aWasPressed()) {
-                    in = !in;
-                    out = false;
-                }
-                if (gamepad1.bWasPressed()) {
-                    out = !out;
-                    in = false;
-                }
-
-                //robot control based off variables
-                if (fly) {
-                    robot.flywheel.setPower(1);
-                    robot.flywheel2.setPower(1);
-                } else {
-                    robot.flywheel.setPower(0);
-                    robot.flywheel2.setPower(0);
-                }
-                if (in) {
-                    robot.intake.setPower(1);
-                } else if (out) {
-                    robot.intake.setPower(-1);
-                } else {
-                    robot.intake.setPower(0);
-                }
-                //-----------------------------------------------INTAKE/FLY
-
-                //-----------------------------------------------FLICK SERVO FSM
-                switch (robot.flickState) {
-                    case START:
-                        if (gamepad1.xWasPressed()) {
-                            flickerTime.reset();
-                            robot.flicker.setPosition(1); //go up
-                            robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
-                        }
-                        break;
-                    case UPWARDS:
-                        if (flickerTime.seconds() >= 0.2) {
-                            flickerTime.reset();
-                            robot.flicker.setPosition(0); //go down
-                            robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
-                        }
-                        break;
-                    case DOWNWARDS:
-                        if (flickerTime.seconds() >= 0.2) {
-                            robot.flickState = Invokation_of_a_False_Life.flickStates.START;
-                        }
-                        break;
-                    default:
-                        robot.flickState = Invokation_of_a_False_Life.flickStates.START;
-                }
-
-                //restart if button is re-pressed
-                if (gamepad1.xWasPressed() && robot.flickState != Invokation_of_a_False_Life.flickStates.START) {
-                    robot.flickState = Invokation_of_a_False_Life.flickStates.START;
-                    robot.flicker.setPosition(0);
-                }
-                //-----------------------------------------------FLICK SERVO FSM
-
-                //-----------------------------------------------HOOD SERVO AUTO ADJ
-                //use the function findIdealLaunchAngle to change servo position,
-                //once testing has been done to see what works (will need to graph)
-                //-----------------------------------------------HOOD SERVO AUTO ADJ
 
 
             } else {
@@ -157,17 +79,104 @@ public class TELEOP_driver_c extends LinearOpMode {
 
             }
 
+            //-----------------------------------------------ALLIANCE PICK
+            if (gamepad1.leftBumperWasPressed()) {
+                is_blue_alliance = true;
+            }
+            if (gamepad1.rightBumperWasPressed()) {
+                is_blue_alliance = false;
+            }
+            //-----------------------------------------------ALLIANCE PICK
+
+
+            //-----------------------------------------------INTAKE/FLY
+            //player manual control of variables
+            if (gamepad1.yWasPressed()) {
+                fly = !fly;
+            }
+            if (gamepad1.aWasPressed()) {
+                in = !in;
+                out = false;
+            }
+            if (gamepad1.bWasPressed()) {
+                out = !out;
+                in = false;
+            }
+
+            //robot control based off variables
+            if (fly) {
+                robot.flywheel.setPower(1);
+                robot.flywheel2.setPower(1);
+            } else {
+                robot.flywheel.setPower(0);
+                robot.flywheel2.setPower(0);
+            }
+            if (in) {
+                robot.intake.setPower(1);
+            } else if (out) {
+                robot.intake.setPower(-1);
+            } else {
+                robot.intake.setPower(0);
+            }
+            //-----------------------------------------------INTAKE/FLY
+
+            //-----------------------------------------------FLICK SERVO FSM
+            switch (robot.flickState) {
+                case START:
+                    if (gamepad1.xWasPressed()) {
+                        flickerTime.reset();
+                        robot.flicker.setPosition(1); //go up
+                        robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
+                    }
+                    break;
+                case UPWARDS:
+                    if (flickerTime.seconds() >= 0.2) {
+                        flickerTime.reset();
+                        robot.flicker.setPosition(0); //go down
+                        robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
+                    }
+                    break;
+                case DOWNWARDS:
+                    if (flickerTime.seconds() >= 0.2) {
+                        robot.flickState = Invokation_of_a_False_Life.flickStates.START;
+                    }
+                    break;
+                default:
+                    robot.flickState = Invokation_of_a_False_Life.flickStates.START;
+            }
+
+            //restart if button is re-pressed
+            if (gamepad1.xWasPressed() && robot.flickState != Invokation_of_a_False_Life.flickStates.START) {
+                robot.flickState = Invokation_of_a_False_Life.flickStates.START;
+                robot.flicker.setPosition(0);
+            }
+            //-----------------------------------------------FLICK SERVO FSM
+
+            //-----------------------------------------------HOOD SERVO AUTO ADJ
+            //use the function findIdealLaunchAngle to change servo position,
+            //once testing has been done to see what works (will need to graph)
+            //-----------------------------------------------HOOD SERVO AUTO ADJ
+
+            //-----------------------------------------------UPDATES
             robot.pinpoint.update();
+            //-----------------------------------------------UPDATES
 
             //-----------------------------------------------TELEMETRY
-            telemetry.addData("Front Left Power", robot.frontLeft.getPower());
-            telemetry.addData("Front Right Power", robot.frontRight.getPower());
-            telemetry.addData("Back Left Power", robot.backLeft.getPower());
-            telemetry.addData("Back Right Power", robot.backRight.getPower());
-            telemetry.addData("fly RPM", robot.getFlywheelRPM());
-            telemetry.addData("heading", robot.pinpoint.getHeading(AngleUnit.RADIANS));
-            telemetry.addData("X pos", robot.pinpoint.getPosX(DistanceUnit.INCH));
-            telemetry.addData("y pos", robot.pinpoint.getPosY(DistanceUnit.INCH));
+            telemetry.addData("---------------------------//", "---*")
+            telemetry.addData("sometimes I get a craving for fruit that", "what~*");
+            telemetry.addData("FL_DT-Power", robot.frontLeft.getPower());
+            telemetry.addData("FR_DT-Power", robot.frontRight.getPower());
+            telemetry.addData("BL_DT-Power", robot.backLeft.getPower());
+            telemetry.addData("BR_DT-Power", robot.backRight.getPower());
+            telemetry.addData("RA_FLY-RPM", robot.getFlywheelRPM());
+            telemetry.addData("INT-Current", robot.intake.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("PPT_IMU-Heading, FTC-COORD", robot.pinpoint.getHeading(AngleUnit.RADIANS));
+            telemetry.addData("PPT-X.pos, FTC-COORD", robot.pinpoint.getPosX(DistanceUnit.INCH));
+            telemetry.addData("PPT-Y.pos, FTC-COORD", robot.pinpoint.getPosY(DistanceUnit.INCH));
+            telemetry.addData("FLICKER-POS", robot.flicker.getPosition());
+            telemetry.addData("FLICKER-STATE", robot.flickState);
+            telemetry.addData("HOOD-POS", robot.hood.getPosition());
+            telemetry.addData("ALLIANCE BLUE?", is_blue_alliance);
             telemetry.update();
             //-----------------------------------------------TELEMETRY
         }
