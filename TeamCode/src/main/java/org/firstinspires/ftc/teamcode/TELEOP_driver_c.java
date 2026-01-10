@@ -21,7 +21,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
-@TeleOp(name = "TELEOP driver-c", group = "Linear Op-mode")
+@TeleOp(name = "PURPLE // * TELEOP driver-c", group = "Linear Op-mode")
 public class TELEOP_driver_c extends LinearOpMode {
 
     private final Invokation_of_a_False_Life robot = new Invokation_of_a_False_Life();
