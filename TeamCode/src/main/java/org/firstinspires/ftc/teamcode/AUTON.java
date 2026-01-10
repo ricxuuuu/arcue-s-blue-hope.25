@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name = "RED // * Auton", group = "Linear Op-mode")
+@Autonomous(name = "RED&BLUE // * Auton", group = "Linear Op-mode")
 public class AUTON extends LinearOpMode {
     private final Invokation_of_a_False_Life robot = new Invokation_of_a_False_Life();
 
