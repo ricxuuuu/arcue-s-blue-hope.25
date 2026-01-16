@@ -76,16 +76,20 @@ public class Invokation_of_a_False_Life {
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         flywheel.setDirection(DcMotor.Direction.REVERSE);
-        intake.setDirection(DcMotorEx.Direction.REVERSE);
         flicker.setPosition(0);
-        hood.setPosition(1);
+        hood.setPosition(0);
 
         //zero power behaviour
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        flywheel2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheel2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         follower = Constants.createFollower(hwMap);
         follower.setStartingPose(f_startingPose);
@@ -113,7 +117,7 @@ public class Invokation_of_a_False_Life {
     public void drive(double axial, double lateral, double yaw) {
 
         // imperfect strafe compensation
-        lateral *= 1.3;
+        lateral *= 1;
 
         // mecanum calculations
         double fl = (axial + lateral + yaw);
@@ -138,15 +142,42 @@ public class Invokation_of_a_False_Life {
         flywheel2.setPower(power);
     }
 
+    public void setFlywheelSpeed(double speed) {
+        flywheel.setVelocity(speed);
+        flywheel2.setVelocity(speed);
+    }
+
+    public void setFlywheelPowerNew(boolean is_blue_alliance) {
+        double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
+
+        if (hypotenuse <= 68) {
+            setFlywheelPower(0.7);
+        } else {
+            setFlywheelPower(1);
+        }
+    }
+
     public void setHoodPos(hoodStates hoodState) {
         if (hoodState == hoodStates.NEAR) {
-            hood.setPosition(1);
+            hood.setPosition(0);
         }
         if (hoodState == hoodStates.MID) {
-            hood.setPosition(0.5);
+            hood.setPosition(0.4);
         }
         if (hoodState == hoodStates.FAR) {
-            hood.setPosition(0);
+            hood.setPosition(1);
+        }
+    }
+
+    public void findIdealLaunchAngle(boolean is_blue_alliance) {
+        double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
+
+        if (hypotenuse <= 68) {
+            hoodState = hoodStates.NEAR;
+        } else if (hypotenuse > 68 && hypotenuse <= 170) {
+            hoodState = hoodStates.MID;
+        } else if (hypotenuse > 170) {
+            hoodState = hoodStates.FAR;
         }
     }
 
@@ -157,7 +188,7 @@ public class Invokation_of_a_False_Life {
         return (velocity / ticksPer) * 60.0; //return rotations per minute
     }
 
-    public double findIdealLaunchAngle(boolean is_blue_alliance) {
+    public double findHypotenuseFromGoal (boolean is_blue_alliance) {
         double hypotenuse = 0;
         pinpoint.update();
 
@@ -166,8 +197,6 @@ public class Invokation_of_a_False_Life {
         } else {
             hypotenuse = Math.hypot(Math.abs(-64 -pinpoint.getPosX(DistanceUnit.INCH)), Math.abs(60 - pinpoint.getPosY(DistanceUnit.INCH)));
         }
-
-        //ADD THE MATH TO FIND IDEAL LAUNCH ANGLE HERE, NEED TESTING TO BE DONE FIRST.
 
         return hypotenuse;
     }
@@ -179,7 +208,7 @@ public class Invokation_of_a_False_Life {
         //find angle to point @goal
         if (is_blue_alliance) {
             angle = Math.atan2(-64 - pinpoint.getPosX(DistanceUnit.INCH), -60 - pinpoint.getPosY(DistanceUnit.INCH));
-            angle = (-angle + Math.PI);
+            angle = (-angle + (2.5 * Math.PI));
         } else {
             angle = Math.atan2(-64 - pinpoint.getPosX(DistanceUnit.INCH), 60 - pinpoint.getPosY(DistanceUnit.INCH));
             angle = -(angle -(Math.PI/4));

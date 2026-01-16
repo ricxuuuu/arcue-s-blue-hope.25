@@ -32,9 +32,9 @@ public class AUTON extends LinearOpMode {
                 robot.setFlywheelPower(1);
                 robot.intake.setPower(1);
                 robot.setHoodPos(Invokation_of_a_False_Life.hoodStates.NEAR);
-                robot.drive(-1,0, 0);
+                robot.drive(-0.55,0, 0);
             }
-            if (this_will_do_something.seconds() >= 0.5 && this_will_do_something.seconds() <= 2.5) {
+            if (this_will_do_something.seconds() >= 0.5 && this_will_do_something.seconds() <= 1.2) {
                 robot.drive(0,0,0);
             }
             if (this_will_do_something.seconds() >= 1.5 && this_will_do_something.seconds() <= 1.8) {
@@ -58,10 +58,10 @@ public class AUTON extends LinearOpMode {
                 robot.setFlywheelPower(0);
                 robot.setHoodPos(Invokation_of_a_False_Life.hoodStates.MID);
             }
-            if (this_will_do_something.seconds() >= 9 && this_will_do_something.seconds() <= 12) {
+            if (this_will_do_something.seconds() >= 9 && this_will_do_something.seconds() <= 10) {
                 robot.drive(0,1,0);
             }
-            if (this_will_do_something.seconds() >= 12) {
+            if (this_will_do_something.seconds() >= 10) {
                 robot.drive(0,0,0);
             }
 

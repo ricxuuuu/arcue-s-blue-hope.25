@@ -5,7 +5,6 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -44,14 +43,13 @@ public class TELEOP_driver_c extends LinearOpMode {
         //get ready to start
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+        robot.pinpoint.setHeading(0, AngleUnit.RADIANS);
         waitForStart();
 
         // runs until the stop button is pressed ---------------------------------------------------
         while (opModeIsActive()) {
             robot.follower.updatePose();
             follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13;
-
-
 
             //-----------------------------------------------DRIVETRAIN
             if (!follower_control) {
@@ -69,12 +67,14 @@ public class TELEOP_driver_c extends LinearOpMode {
 
                 //-----------------------------------------------BOT HOLD ADJ GOAL
                 if (gamepad1.left_trigger > 0.13 && gamepad1.right_trigger < 0.13) {
-                    robot.follower.turnTo(robot.findIdealGoalAngle(true));
                     is_blue_alliance = true;
+                    robot.follower.turnTo(robot.findIdealGoalAngle(is_blue_alliance));
+                    robot.findIdealLaunchAngle(is_blue_alliance);
                 }
                 if (gamepad1.right_trigger > 0.13 && gamepad1.left_trigger < 0.13) {
-                    robot.follower.turnTo(robot.findIdealGoalAngle(false));
                     is_blue_alliance = false;
+                    robot.follower.turnTo(robot.findIdealGoalAngle(is_blue_alliance));
+                    robot.findIdealLaunchAngle(is_blue_alliance);
                 }
                 robot.follower.update();
                 //-----------------------------------------------BOT HOLD ADJ GOAL
@@ -89,14 +89,15 @@ public class TELEOP_driver_c extends LinearOpMode {
             if (gamepad1.yWasPressed()) {
                 fly = !fly;
             }
-            if (gamepad1.aWasPressed()) {
+            if (gamepad1.bWasPressed()) {
                 in = !in;
                 out = false;
             }
-            if (gamepad1.bWasPressed()) {
+            if (gamepad1.aWasPressed()) {
                 out = !out;
                 in = false;
             }
+
             if (gamepad1.dpadLeftWasPressed()) {
                 robot.hoodState = Invokation_of_a_False_Life.hoodStates.NEAR;
             } else if (gamepad1.dpadUpWasPressed()) {
@@ -179,14 +180,18 @@ public class TELEOP_driver_c extends LinearOpMode {
             telemetry.addData("BL_DT-Power", robot.backLeft.getPower());
             telemetry.addData("BR_DT-Power", robot.backRight.getPower());
             telemetry.addData("RA_FLY-RPM", robot.getFlywheelRPM());
+            telemetry.addData("RA_FLY-Current", robot.flywheel.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("STR_FLY-Current", robot.flywheel2.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("INT-Current", robot.intake.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("PPT_IMU-Heading, FTC-COORD", robot.pinpoint.getHeading(AngleUnit.RADIANS));
+            telemetry.addData("PPT_IMU-Heading, FTC-COORD-R", robot.pinpoint.getHeading(AngleUnit.RADIANS));
+            telemetry.addData("PPT_IMU-heading, FTC-COORD-D", robot.pinpoint.getHeading(AngleUnit.DEGREES));
             telemetry.addData("PPT-X.pos, FTC-COORD", robot.pinpoint.getPosX(DistanceUnit.INCH));
             telemetry.addData("PPT-Y.pos, FTC-COORD", robot.pinpoint.getPosY(DistanceUnit.INCH));
             telemetry.addData("FLICKER-POS", robot.flicker.getPosition());
             telemetry.addData("FLICKER-STATE", robot.flickState);
             telemetry.addData("HOOD-POS", robot.hood.getPosition());
             telemetry.addData("ALLIANCE BLUE?", is_blue_alliance);
+            telemetry.addData("HYPT-FROM", robot.findHypotenuseFromGoal(is_blue_alliance));
             telemetry.update();
             //-----------------------------------------------TELEMETRY
         }
