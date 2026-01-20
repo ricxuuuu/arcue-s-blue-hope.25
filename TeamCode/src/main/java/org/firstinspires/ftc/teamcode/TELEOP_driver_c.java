@@ -185,6 +185,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             telemetry.addData("INT-Current", robot.intake.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("PPT_IMU-Heading, FTC-COORD-R", robot.pinpoint.getHeading(AngleUnit.RADIANS));
             telemetry.addData("PPT_IMU-heading, FTC-COORD-D", robot.pinpoint.getHeading(AngleUnit.DEGREES));
+            telemetry.addData("follower-heading", robot.follower.getHeading());
             telemetry.addData("PPT-X.pos, FTC-COORD", robot.pinpoint.getPosX(DistanceUnit.INCH));
             telemetry.addData("PPT-Y.pos, FTC-COORD", robot.pinpoint.getPosY(DistanceUnit.INCH));
             telemetry.addData("FLICKER-POS", robot.flicker.getPosition());
@@ -192,6 +193,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             telemetry.addData("HOOD-POS", robot.hood.getPosition());
             telemetry.addData("ALLIANCE BLUE?", is_blue_alliance);
             telemetry.addData("HYPT-FROM", robot.findHypotenuseFromGoal(is_blue_alliance));
+            telemetry.addData("G-Goal Angle", robot.findIdealGoalAngle(is_blue_alliance));
             telemetry.update();
             //-----------------------------------------------TELEMETRY
         }

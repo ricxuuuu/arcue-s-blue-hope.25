@@ -47,7 +47,7 @@ public class Invokation_of_a_False_Life {
     public enum hoodStates {NEAR, MID, FAR}
     hoodStates hoodState = hoodStates.NEAR;
 
-    Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 0, 0, AngleUnit. DEGREES, 0);
+    Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 72, 72, AngleUnit. DEGREES, 0);
     Pose f_startingPose = PoseConverter.pose2DToPose(startingPose, InvertedFTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
 
     //---------------------- class creation ↑ --- methods ↓ -------
@@ -99,7 +99,7 @@ public class Invokation_of_a_False_Life {
     private void configurePinpoint() {
         //x-off = how left the forward pod is from the tracking point
         //y-off = how forward the strafe pod is from the tracking point
-        pinpoint.setOffsets(27.854, 119.227, DistanceUnit.MM);
+        pinpoint.setOffsets(-119.227, 27.854, DistanceUnit.MM);
 
         //set the encoder type to the gobilda 4-arm pods used on #3.
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
@@ -172,11 +172,11 @@ public class Invokation_of_a_False_Life {
     public void findIdealLaunchAngle(boolean is_blue_alliance) {
         double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
 
-        if (hypotenuse <= 68) {
+        if (hypotenuse <= 60) {
             hoodState = hoodStates.NEAR;
-        } else if (hypotenuse > 68 && hypotenuse <= 170) {
+        } else if (hypotenuse > 60 && hypotenuse <= 118) {
             hoodState = hoodStates.MID;
-        } else if (hypotenuse > 170) {
+        } else if (hypotenuse > 118) {
             hoodState = hoodStates.FAR;
         }
     }
@@ -193,9 +193,9 @@ public class Invokation_of_a_False_Life {
         pinpoint.update();
 
         if (is_blue_alliance) {
-            hypotenuse = Math.hypot(Math.abs(-64 -pinpoint.getPosX(DistanceUnit.INCH)), Math.abs(-60 - pinpoint.getPosY(DistanceUnit.INCH)));
+            hypotenuse = Math.hypot(Math.abs(-72 -pinpoint.getPosX(DistanceUnit.INCH)), Math.abs(-72 - pinpoint.getPosY(DistanceUnit.INCH)));
         } else {
-            hypotenuse = Math.hypot(Math.abs(-64 -pinpoint.getPosX(DistanceUnit.INCH)), Math.abs(60 - pinpoint.getPosY(DistanceUnit.INCH)));
+            hypotenuse = Math.hypot(Math.abs(-72 -pinpoint.getPosX(DistanceUnit.INCH)), Math.abs(72 - pinpoint.getPosY(DistanceUnit.INCH)));
         }
 
         return hypotenuse;
@@ -207,11 +207,9 @@ public class Invokation_of_a_False_Life {
 
         //find angle to point @goal
         if (is_blue_alliance) {
-            angle = Math.atan2(-64 - pinpoint.getPosX(DistanceUnit.INCH), -60 - pinpoint.getPosY(DistanceUnit.INCH));
-            angle = (-angle + (2.5 * Math.PI));
+            angle = Math.atan2(-72 - pinpoint.getPosY(DistanceUnit.INCH), -72 - pinpoint.getPosX(DistanceUnit.INCH));
         } else {
-            angle = Math.atan2(-64 - pinpoint.getPosX(DistanceUnit.INCH), 60 - pinpoint.getPosY(DistanceUnit.INCH));
-            angle = -(angle -(Math.PI/4));
+            angle = Math.atan2(72 - pinpoint.getPosY(DistanceUnit.INCH), -72 - pinpoint.getPosX(DistanceUnit.INCH));
         }
 
         return angle;
