@@ -108,7 +108,7 @@ public class TELEOP_driver_c extends LinearOpMode {
 
             //robot control based off variables
             if (fly) {
-                robot.setFlywheelPower(1);
+                robot.setFlywheelSpeed(5200);
             } else {
                 robot.setFlywheelPower(0);
             }

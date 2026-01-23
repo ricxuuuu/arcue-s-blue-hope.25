@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Size;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ftc.InvertedFTCCoordinates;
 import com.pedropathing.ftc.PoseConverter;
@@ -11,11 +13,24 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import java.util.List;
+
 
 //--------------------------------------------------imports and packages
 
@@ -27,6 +42,8 @@ public class Invokation_of_a_False_Life {
     GoBildaPinpointDriver pinpoint;
 
     public Follower follower;
+    public AprilTagProcessor aprilTPR;
+    private VisionPortal visionPortal;
 
     //create static variables to represent the config strings
     private static final String FRONT_LEFT = "frontLeft";
@@ -49,6 +66,8 @@ public class Invokation_of_a_False_Life {
 
     Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 72, 72, AngleUnit. DEGREES, 0);
     Pose f_startingPose = PoseConverter.pose2DToPose(startingPose, InvertedFTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
+    private final Position cameraPosition = new Position(DistanceUnit.MM, 133.550, 83.102, 256.042, 0);
+    private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, 72.029, 0, 0);
 
     //---------------------- class creation ↑ --- methods ↓ -------
 
@@ -90,12 +109,27 @@ public class Invokation_of_a_False_Life {
 
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         flywheel2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheel.setVelocityPIDFCoefficients(5.0, 0.1, 0.0, 24);
+        flywheel2.setVelocityPIDFCoefficients(5.0, 0.1, 0.0, 24);
 
         follower = Constants.createFollower(hwMap);
         follower.setStartingPose(f_startingPose);
         follower.updatePose();
 
+        //vision things
+        aprilTPR = new AprilTagProcessor.Builder()
+                .setCameraPose(cameraPosition, cameraOrientation)
+                .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
+                .setOutputUnits(DistanceUnit.MM, AngleUnit.DEGREES)
+                .build();
+        VisionPortal.Builder VPbuilder = new VisionPortal.Builder()
+                .setCamera(hwMap.get(WebcamName.class, "webcam"))
+                .setCameraResolution(new Size(640, 360))
+                .enableLiveView(true)
+                .addProcessor(aprilTPR);
+        visionPortal = VPbuilder.build();
     }
+
     private void configurePinpoint() {
         //x-off = how left the forward pod is from the tracking point
         //y-off = how forward the strafe pod is from the tracking point
@@ -112,6 +146,7 @@ public class Invokation_of_a_False_Life {
         //recalibrate, see 'SensorGoBildaPinpoint' for reasoning.
         pinpoint.resetPosAndIMU();
     }
+
 
     //action methods
     public void drive(double axial, double lateral, double yaw) {
@@ -147,16 +182,6 @@ public class Invokation_of_a_False_Life {
         flywheel2.setVelocity(speed);
     }
 
-    public void setFlywheelPowerNew(boolean is_blue_alliance) {
-        double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
-
-        if (hypotenuse <= 68) {
-            setFlywheelPower(0.7);
-        } else {
-            setFlywheelPower(1);
-        }
-    }
-
     public void setHoodPos(hoodStates hoodState) {
         if (hoodState == hoodStates.NEAR) {
             hood.setPosition(0);
@@ -180,6 +205,7 @@ public class Invokation_of_a_False_Life {
             hoodState = hoodStates.FAR;
         }
     }
+
 
     //information acquisition and output methods
     public double getFlywheelRPM() {
@@ -213,6 +239,20 @@ public class Invokation_of_a_False_Life {
         }
 
         return angle;
+    }
+
+    public void localizeViaApril() {
+        List<AprilTagDetection> currentDetections = aprilTPR.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.id == 24 || detection.id == 20) {
+                pinpoint.setPosition(new Pose2D(
+                        DistanceUnit.MM,
+                        detection.robotPose.getPosition().x,
+                        detection.robotPose.getPosition().y,
+                        AngleUnit.DEGREES,
+                        detection.ftcPose.yaw));
+            }
+        }
     }
 
 }
