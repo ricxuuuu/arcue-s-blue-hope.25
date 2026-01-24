@@ -61,7 +61,7 @@ public class Invokation_of_a_False_Life {
     public enum flickStates {START,UPWARDS,DOWNWARDS}
     flickStates flickState = flickStates.START;
 
-    public enum hoodStates {NEAR, MID, FAR}
+    public enum hoodStates {NEAR, RASPBERRY, MID, FAR}
     hoodStates hoodState = hoodStates.NEAR;
 
     Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 72, 72, AngleUnit. DEGREES, 0);
@@ -186,6 +186,9 @@ public class Invokation_of_a_False_Life {
         if (hoodState == hoodStates.NEAR) {
             hood.setPosition(0);
         }
+        if (hoodState == hoodStates.RASPBERRY) {
+            hood.setPosition(0.2);
+        }
         if (hoodState == hoodStates.MID) {
             hood.setPosition(0.4);
         }
@@ -194,15 +197,31 @@ public class Invokation_of_a_False_Life {
         }
     }
 
-    public void findIdealLaunchAngle(boolean is_blue_alliance) {
+    public void setIdealHoodAngle(boolean is_blue_alliance) {
         double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
 
-        if (hypotenuse <= 60) {
+        if (hypotenuse <= 42) {
             hoodState = hoodStates.NEAR;
-        } else if (hypotenuse > 60 && hypotenuse <= 118) {
+        } else if (hypotenuse > 42 && hypotenuse <= 68) {
+            hoodState = hoodStates.RASPBERRY;
+        } else if (hypotenuse >68 && hypotenuse <= 108) {
             hoodState = hoodStates.MID;
-        } else if (hypotenuse > 118) {
+        } else if (hypotenuse > 108) {
             hoodState = hoodStates.FAR;
+        }
+    }
+
+    public void setIdealFlightSpeed(boolean is_blue_alliance) {
+        double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
+
+        if (hypotenuse <= 42) {
+            setFlywheelSpeed(4000);
+        } else if (hypotenuse > 42 && hypotenuse <= 68) {
+            setFlywheelSpeed(4400);
+        } else if (hypotenuse >68 && hypotenuse <= 108) {
+            setFlywheelSpeed(4700);
+        } else if (hypotenuse > 108) {
+            setFlywheelPower(1);
         }
     }
 

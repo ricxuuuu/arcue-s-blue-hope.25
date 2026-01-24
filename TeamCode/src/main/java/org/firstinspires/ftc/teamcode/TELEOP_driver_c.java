@@ -69,19 +69,18 @@ public class TELEOP_driver_c extends LinearOpMode {
                 if (gamepad1.left_trigger > 0.13 && gamepad1.right_trigger < 0.13) {
                     is_blue_alliance = true;
                     robot.follower.turnTo(robot.findIdealGoalAngle(is_blue_alliance));
-                    robot.findIdealLaunchAngle(is_blue_alliance);
+                    robot.setIdealHoodAngle(is_blue_alliance);
                 }
                 if (gamepad1.right_trigger > 0.13 && gamepad1.left_trigger < 0.13) {
                     is_blue_alliance = false;
                     robot.follower.turnTo(robot.findIdealGoalAngle(is_blue_alliance));
-                    robot.findIdealLaunchAngle(is_blue_alliance);
+                    robot.setIdealHoodAngle(is_blue_alliance);
                 }
                 robot.follower.update();
                 //-----------------------------------------------BOT HOLD ADJ GOAL
 
             }
             //-----------------------------------------------DRIVETRAIN
-
 
 
             //-----------------------------------------------INTAKE/FLY
@@ -100,6 +99,8 @@ public class TELEOP_driver_c extends LinearOpMode {
 
             if (gamepad1.dpadLeftWasPressed()) {
                 robot.hoodState = Invokation_of_a_False_Life.hoodStates.NEAR;
+            } else if (gamepad1.dpadDownWasPressed()) {
+                robot.hoodState = Invokation_of_a_False_Life.hoodStates.RASPBERRY;
             } else if (gamepad1.dpadUpWasPressed()) {
                 robot.hoodState = Invokation_of_a_False_Life.hoodStates.MID;
             } else if (gamepad1.dpadRightWasPressed()) {
