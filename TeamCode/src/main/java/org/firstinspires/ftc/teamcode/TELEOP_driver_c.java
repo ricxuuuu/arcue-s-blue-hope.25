@@ -41,9 +41,10 @@ public class TELEOP_driver_c extends LinearOpMode {
         //-----------------------------------------------INTAKE/FLY PREP
 
         //get ready to start
+        robot.localizeViaApril();
+        robot.pinpoint.setHeading(0, AngleUnit.RADIANS);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        robot.pinpoint.setHeading(0, AngleUnit.RADIANS);
         waitForStart();
 
         // runs until the stop button is pressed ---------------------------------------------------
@@ -169,6 +170,7 @@ public class TELEOP_driver_c extends LinearOpMode {
 
             //-----------------------------------------------UPDATES
             robot.pinpoint.update();
+            robot.localizeViaApril();
             //-----------------------------------------------UPDATES
 
 
