@@ -41,6 +41,8 @@ public class Invokation_of_a_False_Life {
     public Servo hood, flicker;
     GoBildaPinpointDriver pinpoint;
 
+    public double hallucination;
+
     public Follower follower;
     public AprilTagProcessor aprilTPR;
     private VisionPortal visionPortal;
@@ -64,7 +66,7 @@ public class Invokation_of_a_False_Life {
     public enum hoodStates {NEAR, RASPBERRY, MID, FAR}
     hoodStates hoodState = hoodStates.NEAR;
 
-    Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 72, 72, AngleUnit. DEGREES, 0);
+    Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 72, 72, AngleUnit. DEGREES, -90);
     Pose f_startingPose = PoseConverter.pose2DToPose(startingPose, InvertedFTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
     private final Position cameraPosition = new Position(DistanceUnit.MM, 133.550, 83.102, 256.042, 0);
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, 72.029, 0, 0);
@@ -119,13 +121,16 @@ public class Invokation_of_a_False_Life {
         //vision things
         aprilTPR = new AprilTagProcessor.Builder()
                 .setCameraPose(cameraPosition, cameraOrientation)
-                .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
+                //.setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
+                //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
                 .setOutputUnits(DistanceUnit.MM, AngleUnit.DEGREES)
                 .build();
+        aprilTPR.setDecimation(1);
         VisionPortal.Builder VPbuilder = new VisionPortal.Builder()
                 .setCamera(hwMap.get(WebcamName.class, "webcam"))
-                .setCameraResolution(new Size(640, 360))
-                .enableLiveView(true)
+                //.setCameraResolution(new Size(640, 360))
+                .enableLiveView(false)
+
                 .addProcessor(aprilTPR);
         visionPortal = VPbuilder.build();
     }
@@ -263,15 +268,45 @@ public class Invokation_of_a_False_Life {
     public void localizeViaApril() {
         List<AprilTagDetection> currentDetections = aprilTPR.getDetections();
         for (AprilTagDetection detection : currentDetections) {
-            if (detection.id == 24 || detection.id == 20) {
-                pinpoint.setPosition(new Pose2D(
-                        DistanceUnit.MM,
-                        detection.robotPose.getPosition().x,
-                        detection.robotPose.getPosition().y,
-                        AngleUnit.DEGREES,
-                        detection.ftcPose.yaw));
+            if (detection.id == 24) {
+                hallucination = detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES);
+                if (hallucination < 90 && hallucination > 0) {
+                    pinpoint.setPosition(new Pose2D(
+                            DistanceUnit.MM,
+                            detection.robotPose.getPosition().x,
+                            detection.robotPose.getPosition().y,
+                            AngleUnit.DEGREES,
+                            translateTCHeading(true, hallucination)));
+                }
+            }
+            if (detection.id == 20) {
+                hallucination = detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES);
+                if (hallucination < 0 && hallucination > -90) {
+                    pinpoint.setPosition(new Pose2D(
+                            DistanceUnit.MM,
+                            detection.robotPose.getPosition().x,
+                            detection.robotPose.getPosition().y,
+                            AngleUnit.DEGREES,
+                            translateTCHeading(false, hallucination)));
+                }
             }
         }
+    }
+
+    private double translateTCHeading(boolean red, double angle_given) {
+        if (red) {
+            angle_given += 90;
+        } else {
+            angle_given -= 90;
+        } //adj for team goal heading default difference
+
+        angle_given = angle_given % 360;
+        angle_given = (angle_given + 360) % 360;
+        if (angle_given > 180) {
+            angle_given -= 360;
+        } //normalize
+
+        return angle_given; //heading 0 facing audience / north if X is vert.
     }
 
 }

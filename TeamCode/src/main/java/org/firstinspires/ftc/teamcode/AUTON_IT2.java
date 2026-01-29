@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 
+import com.pedropathing.ftc.InvertedFTCCoordinates;
+import com.pedropathing.ftc.PoseConverter;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -19,6 +21,7 @@ import com.pedropathing.paths.PathChain;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 @Autonomous(name = "AUTON IT2B // OUTOFCOMMISSION", group = "Linear Op-mode")
 public class AUTON_IT2 extends LinearOpMode {
@@ -26,7 +29,7 @@ public class AUTON_IT2 extends LinearOpMode {
     private final Invokation_of_a_False_Life robot = new Invokation_of_a_False_Life();
 
     private final Pose startPose = new Pose(126.4,123.2,2.2080);
-    private final Pose shootPose = new Pose(96,96,2.356);
+    private final Pose shootPose = new Pose(87,87,2.356);
     private final Pose approachTPose = new Pose(96,84,1.57);
     private final Pose pickupTPose = new Pose(132,84,1.57);
     private final Pose approachMPose = new Pose(96,60,1.57);
@@ -44,9 +47,11 @@ public class AUTON_IT2 extends LinearOpMode {
 
         robot.init(hardwareMap);
         robot.follower.setStartingPose(startPose);
+        Pose2D convPose2D = PoseConverter.poseToPose2D(startPose, InvertedFTCCoordinates.INSTANCE);
 
         buildPaths();
         pathState = 0;
+        robot.pinpoint.setPosition(convPose2D);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -62,55 +67,59 @@ public class AUTON_IT2 extends LinearOpMode {
             switch (pathState) {
                 case 0:
                     makeLoudNoises();
-                    follower.followPath(scorePre);
+                    robot.follower.followPath(scorePre);
                     pathState = 1;
                     break;
                 case 1:
-                    if (!follower.isBusy()) {
+                    if (!robot.follower.isBusy()) {
                         tripleShot();
                         sleep(222);
-                        follower.followPath(scoreT);
+                        robot.follower.followPath(scoreT);
                         pathState = 2;
                     }
                     makeLoudNoises();
                     break;
                 case 2:
-                    if (!follower.isBusy()) {
+                    if (!robot.follower.isBusy()) {
                         tripleShot();
                         sleep(222);
-                        follower.followPath(scoreM);
+                        robot.follower.followPath(scoreM);
                         pathState = 3;
                     }
                     makeLoudNoises();
                     break;
                 case 3:
-                    if (!follower.isBusy()) {
+                    if (!robot.follower.isBusy()) {
                         tripleShot();
                         sleep(222);
-                        follower.followPath(scoreB);
+                        robot.follower.followPath(scoreB);
                         pathState = 4;
                     }
                     makeLoudNoises();
                     break;
                 case 4:
-                    if (!follower.isBusy()) {
+                    if (!robot.follower.isBusy()) {
                         tripleShot();
                         sleep(222);
-                        follower.followPath(runAway);
+                        robot.follower.followPath(runAway);
                         pathState = 5;
                     }
                     makeLoudNoises();
                     break;
                 case 5:
-                    if (!follower.isBusy()) {
+                    if (!robot.follower.isBusy()) {
                         robot.intake.setPower(0);
                         robot.setFlywheelPower(0);
                         pathState = -999;
                     }
+                default:
+                    robot.intake.setPower(-1);
+                    break;
 
             }
 
             telemetry.addData("---------------------------//", "omg");
+            telemetry.addData("pathState", pathState);
             telemetry.update();
         }
     }
@@ -180,7 +189,7 @@ public class AUTON_IT2 extends LinearOpMode {
 
     private void makeLoudNoises() {
         robot.intake.setPower(1);
-        robot.setFlywheelSpeed(4777);
+        robot.setFlywheelSpeed(4444);
     }
 
 }

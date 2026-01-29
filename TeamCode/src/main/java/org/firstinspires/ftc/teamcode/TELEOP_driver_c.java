@@ -110,7 +110,7 @@ public class TELEOP_driver_c extends LinearOpMode {
 
             //robot control based off variables
             if (fly) {
-                robot.setFlywheelSpeed(5200);
+                robot.setFlywheelPower(1);
             } else {
                 robot.setFlywheelPower(0);
             }
@@ -197,6 +197,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             telemetry.addData("ALLIANCE BLUE?", is_blue_alliance);
             telemetry.addData("HYPT-FROM", robot.findHypotenuseFromGoal(is_blue_alliance));
             telemetry.addData("G-Goal Angle", robot.findIdealGoalAngle(is_blue_alliance));
+            telemetry.addData("jiwdo", robot.hallucination);
             telemetry.update();
             //-----------------------------------------------TELEMETRY
         }
