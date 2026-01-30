@@ -197,7 +197,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             telemetry.addData("ALLIANCE BLUE?", is_blue_alliance);
             telemetry.addData("HYPT-FROM", robot.findHypotenuseFromGoal(is_blue_alliance));
             telemetry.addData("G-Goal Angle", robot.findIdealGoalAngle(is_blue_alliance));
-            telemetry.addData("jiwdo", robot.hallucination);
+            telemetry.addData("RAW-g_angle", robot.hallucination);
             telemetry.update();
             //-----------------------------------------------TELEMETRY
         }
