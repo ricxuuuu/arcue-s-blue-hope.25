@@ -41,7 +41,7 @@ public class Invokation_of_a_False_Life {
     public Servo hood, flicker;
     GoBildaPinpointDriver pinpoint;
 
-    public double hallucination;
+    public double detected_angle;
 
     public Follower follower;
     public AprilTagProcessor aprilTPR;
@@ -269,25 +269,25 @@ public class Invokation_of_a_False_Life {
         List<AprilTagDetection> currentDetections = aprilTPR.getDetections();
         for (AprilTagDetection detection : currentDetections) {
             if (detection.id == 24) {
-                hallucination = detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES);
-                if (hallucination < 90 && hallucination > 0) {
+                detected_angle = detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES);
+                if (detected_angle < 90 && detected_angle > 0) {
                     pinpoint.setPosition(new Pose2D(
                             DistanceUnit.MM,
                             detection.robotPose.getPosition().x,
                             detection.robotPose.getPosition().y,
                             AngleUnit.DEGREES,
-                            translateTCHeading(true, hallucination)));
+                            translateTCHeading(true, detected_angle)));
                 }
             }
             if (detection.id == 20) {
-                hallucination = detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES);
-                if (hallucination < 0 && hallucination > -90) {
+                detected_angle = detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES);
+                if (detected_angle < 0 && detected_angle > -90) {
                     pinpoint.setPosition(new Pose2D(
                             DistanceUnit.MM,
                             detection.robotPose.getPosition().x,
                             detection.robotPose.getPosition().y,
                             AngleUnit.DEGREES,
-                            translateTCHeading(false, hallucination)));
+                            translateTCHeading(false, detected_angle)));
                 }
             }
         }
