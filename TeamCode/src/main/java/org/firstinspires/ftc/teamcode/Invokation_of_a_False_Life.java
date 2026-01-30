@@ -113,8 +113,6 @@ public class Invokation_of_a_False_Life {
 
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         flywheel2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        flywheel.setVelocityPIDFCoefficients(5.0, 0.1, 0.0, 24);
-        flywheel2.setVelocityPIDFCoefficients(5.0, 0.1, 0.0, 24);
 
         follower = Constants.createFollower(hwMap);
         follower.setStartingPose(f_startingPose);

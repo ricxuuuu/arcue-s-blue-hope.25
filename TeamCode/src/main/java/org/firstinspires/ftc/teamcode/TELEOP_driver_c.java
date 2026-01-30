@@ -50,7 +50,7 @@ public class TELEOP_driver_c extends LinearOpMode {
 
         // runs until the stop button is pressed ---------------------------------------------------
         while (opModeIsActive()) {
-            robot.follower.update();
+            robot.follower.updatePose();
             follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13;
 
             //-----------------------------------------------DRIVETRAIN
@@ -83,13 +83,13 @@ public class TELEOP_driver_c extends LinearOpMode {
             //-----------------------------------------------DRIVETRAIN
 
             if (!ultima_ratio) {
-                if (!gamepad1.isRumbling()) {
-                    gamepad1.rumble(0.2, 0.2, 1333);
-                }
+                gamepad1.stopRumble();
                 robot.findIdealFlightSpeed(is_blue_alliance);
                 robot.setIdealHoodState(is_blue_alliance);
             } else {
-                gamepad1.stopRumble();
+                if (!gamepad1.isRumbling()) {
+                    gamepad1.rumble(0.2, 0.2, 1333);
+                }
             }
 
             //-----------------------------------------------INTAKE/FLY

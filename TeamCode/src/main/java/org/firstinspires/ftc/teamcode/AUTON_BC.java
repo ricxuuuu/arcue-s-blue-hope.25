@@ -64,7 +64,7 @@ public class AUTON_BC extends LinearOpMode {
                 case 2:
                     if (!robot.follower.isBusy()) {
                         robot.setFlywheelPower(1);
-                        sleep(888);
+                        sleep(1900);
                         tripleShot();
                         robot.intake.setPower(1);
                         robot.setFlywheelPower(0);
@@ -75,7 +75,7 @@ public class AUTON_BC extends LinearOpMode {
                 case 3:
                     if (!robot.follower.isBusy()) {
                         robot.setFlywheelPower(1);
-                        sleep(888);
+                        sleep(1900);
                         tripleShot();
                         robot.intake.setPower(1);
                         robot.setFlywheelPower(0);
@@ -148,12 +148,12 @@ public class AUTON_BC extends LinearOpMode {
         oneShot();
         sleep(100);
         robot.intake.setPower(1);
-        sleep(700);
+        sleep(800);
         robot.intake.setPower(0);
         oneShot();
         sleep(100);
         robot.intake.setPower(1);
-        sleep(700);
+        sleep(800);
         robot.intake.setPower(0.5);
         oneShot();
         robot.intake.setPower(0);
