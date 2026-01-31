@@ -50,7 +50,7 @@ public class TELEOP_driver_c extends LinearOpMode {
 
         // runs until the stop button is pressed ---------------------------------------------------
         while (opModeIsActive()) {
-            robot.follower.updatePose();
+            robot.follower.update();
             follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13;
 
             //-----------------------------------------------DRIVETRAIN
