@@ -66,6 +66,8 @@ public class Invokation_of_a_False_Life {
     public enum hoodStates {NEAR, RASPBERRY, MID, FAR}
     hoodStates hoodState = hoodStates.NEAR;
 
+    public double dream_of_flight = 1;
+
     Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 72, 72, AngleUnit. DEGREES, -90);
     Pose f_startingPose = PoseConverter.pose2DToPose(startingPose, InvertedFTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
     private final Position cameraPosition = new Position(DistanceUnit.MM, 133.550, 83.102, 256.042, 0);
@@ -182,17 +184,12 @@ public class Invokation_of_a_False_Life {
         flywheel2.setPower(power);
     }
 
-    public void setFlywheelSpeed(double speed) {
-        flywheel.setVelocity(speed);
-        flywheel2.setVelocity(speed);
-    }
-
     public void setHoodPos(hoodStates hoodState) {
         if (hoodState == hoodStates.NEAR) {
             hood.setPosition(0);
         }
         if (hoodState == hoodStates.RASPBERRY) {
-            hood.setPosition(0.2);
+            hood.setPosition(0.17);
         }
         if (hoodState == hoodStates.MID) {
             hood.setPosition(0.4);
@@ -202,31 +199,31 @@ public class Invokation_of_a_False_Life {
         }
     }
 
-    public void setIdealHoodAngle(boolean is_blue_alliance) {
+    public void setIdealHoodState(boolean is_blue_alliance) {
         double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
 
         if (hypotenuse <= 42) {
             hoodState = hoodStates.NEAR;
-        } else if (hypotenuse > 42 && hypotenuse <= 68) {
+        } else if (hypotenuse > 42 && hypotenuse <= 79) {
             hoodState = hoodStates.RASPBERRY;
-        } else if (hypotenuse >68 && hypotenuse <= 108) {
-            hoodState = hoodStates.MID;
-        } else if (hypotenuse > 108) {
+        } else if (hypotenuse >68 && hypotenuse <= 118) {
+            hoodState = hoodStates.FAR;
+        } else if (hypotenuse > 118) {
             hoodState = hoodStates.FAR;
         }
     }
 
-    public void setIdealFlightSpeed(boolean is_blue_alliance) {
+    public void findIdealFlightSpeed(boolean is_blue_alliance) {
         double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
 
         if (hypotenuse <= 42) {
-            setFlywheelSpeed(4000);
-        } else if (hypotenuse > 42 && hypotenuse <= 68) {
-            setFlywheelSpeed(4400);
-        } else if (hypotenuse >68 && hypotenuse <= 108) {
-            setFlywheelSpeed(4700);
-        } else if (hypotenuse > 108) {
-            setFlywheelPower(1);
+            dream_of_flight = 0.6;
+        } else if (hypotenuse > 42 && hypotenuse <= 79) {
+            dream_of_flight = 0.6;
+        } else if (hypotenuse >68 && hypotenuse <= 118) {
+            dream_of_flight = 0.6;
+        } else if (hypotenuse > 118) {
+            dream_of_flight = 1;
         }
     }
 

@@ -35,14 +35,15 @@ public class TELEOP_driver_c extends LinearOpMode {
         boolean in = false;
         boolean out = false;
         boolean follower_control;
+        boolean ultima_ratio = false;
 
         //start up a timer for flicker use
         ElapsedTime flickerTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
         //-----------------------------------------------INTAKE/FLY PREP
 
         //get ready to start
-        robot.localizeViaApril();
         robot.pinpoint.setHeading(0, AngleUnit.RADIANS);
+        robot.localizeViaApril();
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
@@ -70,22 +71,32 @@ public class TELEOP_driver_c extends LinearOpMode {
                 if (gamepad1.left_trigger > 0.13 && gamepad1.right_trigger < 0.13) {
                     is_blue_alliance = true;
                     robot.follower.turnTo(robot.findIdealGoalAngle(is_blue_alliance));
-                    robot.setIdealHoodAngle(is_blue_alliance);
+
                 }
                 if (gamepad1.right_trigger > 0.13 && gamepad1.left_trigger < 0.13) {
                     is_blue_alliance = false;
                     robot.follower.turnTo(robot.findIdealGoalAngle(is_blue_alliance));
-                    robot.setIdealHoodAngle(is_blue_alliance);
                 }
                 robot.follower.update();
                 //-----------------------------------------------BOT HOLD ADJ GOAL
-
             }
             //-----------------------------------------------DRIVETRAIN
 
+            if (!ultima_ratio) {
+                if (!gamepad1.isRumbling()) {
+                    gamepad1.rumble(0.2, 0.2, 1333);
+                }
+                robot.findIdealFlightSpeed(is_blue_alliance);
+                robot.setIdealHoodState(is_blue_alliance);
+            } else {
+                gamepad1.stopRumble();
+            }
 
             //-----------------------------------------------INTAKE/FLY
             //player manual control of variables
+            if(gamepad1.shareWasPressed()) {
+                ultima_ratio = !ultima_ratio;
+            }
             if (gamepad1.yWasPressed()) {
                 fly = !fly;
             }
@@ -108,9 +119,11 @@ public class TELEOP_driver_c extends LinearOpMode {
                 robot.hoodState = Invokation_of_a_False_Life.hoodStates.FAR;
             }
 
-            //robot control based off variables
-            if (fly) {
+            //control based off variables
+            if (fly && ultima_ratio) {
                 robot.setFlywheelPower(1);
+            } else if (fly) {
+                robot.setFlywheelPower(robot.dream_of_flight);
             } else {
                 robot.setFlywheelPower(0);
             }
@@ -122,7 +135,6 @@ public class TELEOP_driver_c extends LinearOpMode {
                 robot.intake.setPower(0);
             }
 
-            robot.setHoodPos(robot.hoodState);
             //-----------------------------------------------INTAKE/FLY
 
 
@@ -160,19 +172,11 @@ public class TELEOP_driver_c extends LinearOpMode {
             //-----------------------------------------------FLICK SERVO FSM
 
 
-
-            //-----------------------------------------------HOOD SERVO AUTO ADJ
-            //use the function findIdealLaunchAngle to change servo position,
-            //once testing has been done to see what works (will need to graph)
-            //-----------------------------------------------HOOD SERVO AUTO ADJ
-
-
-
             //-----------------------------------------------UPDATES
-            robot.pinpoint.update();
+            robot.setHoodPos(robot.hoodState);
             robot.localizeViaApril();
+            robot.pinpoint.update();
             //-----------------------------------------------UPDATES
-
 
 
             //-----------------------------------------------TELEMETRY
