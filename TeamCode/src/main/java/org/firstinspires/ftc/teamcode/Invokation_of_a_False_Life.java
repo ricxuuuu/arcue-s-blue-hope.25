@@ -125,7 +125,7 @@ public class Invokation_of_a_False_Life {
                 //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
                 .setOutputUnits(DistanceUnit.MM, AngleUnit.DEGREES)
                 .build();
-        aprilTPR.setDecimation(1);
+        aprilTPR.setDecimation(2);
         VisionPortal.Builder VPbuilder = new VisionPortal.Builder()
                 .setCamera(hwMap.get(WebcamName.class, "webcam"))
                 //.setCameraResolution(new Size(640, 360))
@@ -215,11 +215,11 @@ public class Invokation_of_a_False_Life {
         double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
 
         if (hypotenuse <= 42) {
-            dream_of_flight = 0.6;
+            dream_of_flight = 0.84;
         } else if (hypotenuse > 42 && hypotenuse <= 79) {
-            dream_of_flight = 0.6;
+            dream_of_flight = 0.84;
         } else if (hypotenuse >68 && hypotenuse <= 118) {
-            dream_of_flight = 0.6;
+            dream_of_flight = 0.84;
         } else if (hypotenuse > 118) {
             dream_of_flight = 1;
         }

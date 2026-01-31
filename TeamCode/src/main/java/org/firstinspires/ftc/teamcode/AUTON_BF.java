@@ -35,7 +35,7 @@ public class AUTON_BF extends LinearOpMode {
     public void runOpMode() {
 
         robot.init(hardwareMap);
-        robot.hood.setPosition(0.6);
+
 
         robot.follower.setPose(startPose);
         buildPaths();
@@ -47,13 +47,14 @@ public class AUTON_BF extends LinearOpMode {
 
         while (opModeIsActive()) {
 
+            robot.hood.setPosition(0.6);
             robot.follower.update();
             robot.pinpoint.update();
 
             switch (pathState) {
                 case 0:
                     robot.intake.setPower(1);
-                    robot.setFlywheelPower(0.65);
+                    robot.setFlywheelPower(0.81);
                     robot.follower.followPath(scorePre, true);
                     pathState = 1;
                     break;
@@ -69,7 +70,7 @@ public class AUTON_BF extends LinearOpMode {
                     break;
                 case 2:
                     if (!robot.follower.isBusy()) {
-                        robot.setFlywheelPower(0.65);
+                        robot.setFlywheelPower(0.81);
                         sleep(1900);
                         tripleShot();
                         robot.setFlywheelPower(0);
@@ -80,7 +81,7 @@ public class AUTON_BF extends LinearOpMode {
                     break;
                 case 3:
                     if (!robot.follower.isBusy()) {
-                        robot.setFlywheelPower(0.65);
+                        robot.setFlywheelPower(0.81);
                         sleep(1900);
                         tripleShot();
                         robot.setFlywheelPower(0);
@@ -91,7 +92,7 @@ public class AUTON_BF extends LinearOpMode {
                     break;
                 case 4:
                     if (!robot.follower.isBusy()) {
-                        robot.setFlywheelPower(0.65);
+                        robot.setFlywheelPower(0.81);
                         sleep(1900);
                         tripleShot();
                         robot.setFlywheelPower(0);
@@ -108,7 +109,7 @@ public class AUTON_BF extends LinearOpMode {
                     }
                     break;
                 default:
-                    robot.intake.setPower(-1);
+                    robot.intake.setPower(0);
                     break;
 
             }
@@ -188,7 +189,7 @@ public class AUTON_BF extends LinearOpMode {
 
     private void pulseFlywheel() {
         robot.setFlywheelPower(0);
-        robot.setFlywheelPower(0.65);
+        robot.setFlywheelPower(0.81);
     }
 
 }

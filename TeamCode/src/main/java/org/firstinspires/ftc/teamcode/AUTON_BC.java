@@ -14,9 +14,9 @@ public class AUTON_BC extends LinearOpMode {
 
     //-----------------------------------------------poses
     private final Pose startPose = new Pose(55.25,8.8, Math.toRadians(90));
-    private final Pose shootPose = new Pose(56,15,Math.toRadians(113));
+    private final Pose shootPose = new Pose(56,15,Math.toRadians(115.46));
     private final Pose approachMPose = new Pose(48,60,Math.toRadians(180));
-    private final Pose pickupMPose = new Pose(9.3,60,Math.toRadians(180));
+    private final Pose pickupMPose = new Pose(9.3,57,Math.toRadians(180));
     private final Pose approachBPose = new Pose(48,36,Math.toRadians(180));
     private final Pose pickupBPose = new Pose(9.3,36,Math.toRadians(180));
     private final Pose leave = new Pose(24, 24, Math.toRadians(0));
@@ -29,7 +29,6 @@ public class AUTON_BC extends LinearOpMode {
     public void runOpMode() {
 
         robot.init(hardwareMap);
-        robot.hood.setPosition(1);
 
         robot.follower.setPose(startPose);
         buildPaths();
@@ -38,9 +37,12 @@ public class AUTON_BC extends LinearOpMode {
         telemetry.addData("BLUE AUDIENCE", "Initialized");
         telemetry.update();
         waitForStart();
+        robot.hood.setPosition(1);
+        sleep(800);
 
         while (opModeIsActive()) {
 
+            robot.hood.setPosition(1);
             robot.follower.update();
             robot.pinpoint.update();
 
@@ -63,6 +65,7 @@ public class AUTON_BC extends LinearOpMode {
                     break;
                 case 2:
                     if (!robot.follower.isBusy()) {
+                        robot.follower.turnTo(shootPose.getHeading());
                         robot.setFlywheelPower(1);
                         sleep(1900);
                         tripleShot();
@@ -74,6 +77,7 @@ public class AUTON_BC extends LinearOpMode {
                     break;
                 case 3:
                     if (!robot.follower.isBusy()) {
+                        robot.follower.turnTo(shootPose.getHeading());
                         robot.setFlywheelPower(1);
                         sleep(1900);
                         tripleShot();
@@ -90,7 +94,7 @@ public class AUTON_BC extends LinearOpMode {
                     }
                     break;
                 default:
-                    robot.intake.setPower(-1);
+                    robot.intake.setPower(0);
                     break;
 
             }
