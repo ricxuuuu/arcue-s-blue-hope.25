@@ -10,6 +10,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -22,6 +25,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 //--------------------------------------------------imports and packages
@@ -34,10 +38,11 @@ public class Invokation_of_a_False_Life {
     GoBildaPinpointDriver pinpoint;
 
     public double hallucination;
+    public int currentDecimation;
 
     public Follower follower;
     public AprilTagProcessor aprilTPR;
-    private VisionPortal visionPortal;
+    public VisionPortal visionPortal;
 
     //create static variables to represent the config strings
     private static final String FRONT_LEFT = "frontLeft";
@@ -55,7 +60,7 @@ public class Invokation_of_a_False_Life {
     public enum flickStates {START,UPWARDS,DOWNWARDS}
     flickStates flickState = flickStates.START;
 
-    public enum hoodStates {NEAR, RASPBERRY, MID, FAR}
+    public enum hoodStates {NEAR, RASPBERRY, MID, FAR, HORIZON_ROSEMARY}
     hoodStates hoodState = hoodStates.NEAR;
 
     public double dream_of_flight = 1;
@@ -123,6 +128,8 @@ public class Invokation_of_a_False_Life {
 
                 .addProcessor(aprilTPR);
         visionPortal = VPbuilder.build();
+
+        traumatizeCamera(10, 33);
     }
 
     private void configurePinpoint() {
@@ -135,6 +142,23 @@ public class Invokation_of_a_False_Life {
                         GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
         pinpoint.resetPosAndIMU();
+    }
+
+    private void traumatizeCamera(int exposure, int gain) {
+        if (!(visionPortal == null)) {
+
+            //exposure
+            ExposureControl exposure_to_death = visionPortal.getCameraControl(ExposureControl.class);
+            if (exposure_to_death.getMode() != ExposureControl.Mode.Manual) {
+                exposure_to_death.setMode(ExposureControl.Mode.Manual);
+            }
+            exposure_to_death.setExposure((long)exposure, TimeUnit.MILLISECONDS);
+
+            //gain
+            GainControl my_self_benefit = visionPortal.getCameraControl(GainControl.class);
+            my_self_benefit.setGain(gain);
+
+        }
     }
 
 
@@ -167,7 +191,7 @@ public class Invokation_of_a_False_Life {
         flywheel2.setPower(power);
     }
 
-    public void setHoodPos(hoodStates hoodState) {
+    public void setHoodPos(hoodStates hoodState, boolean is_blue_alliance) {
         if (hoodState == hoodStates.NEAR) {
             hood.setPosition(0);
         }
@@ -179,6 +203,16 @@ public class Invokation_of_a_False_Life {
         }
         if (hoodState == hoodStates.FAR) {
             hood.setPosition(1);
+        }
+        if (hoodState == hoodStates.HORIZON_ROSEMARY) {
+            double xx = findHypotenuseFromGoal(is_blue_alliance);
+            double yy = (-0.00006233 * xx * xx) + (0.02062 * xx) - 0.5139;
+            if (yy < 0) {
+                yy = 0;
+            } else if (yy > 1) {
+                yy = 1;
+            }
+            hood.setPosition(yy);
         }
     }
 
@@ -199,14 +233,20 @@ public class Invokation_of_a_False_Life {
     public void findIdealFlightSpeed(boolean is_blue_alliance) {
         double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
 
-        if (hypotenuse <= 42) {
+        if (hypotenuse <= 118) {
             dream_of_flight = 0.84;
-        } else if (hypotenuse > 42 && hypotenuse <= 79) {
-            dream_of_flight = 0.84;
-        } else if (hypotenuse >68 && hypotenuse <= 118) {
-            dream_of_flight = 0.84;
-        } else if (hypotenuse > 118) {
+        } else {
             dream_of_flight = 1;
+        }
+    }
+
+    public void adjustDecimation() {
+        if (pinpoint.getPosX(DistanceUnit.INCH) > 24) {
+            aprilTPR.setDecimation(1);
+            currentDecimation = 1;
+        } else {
+            aprilTPR.setDecimation(3);
+            currentDecimation = 3;
         }
     }
 

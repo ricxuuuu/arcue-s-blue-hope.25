@@ -184,19 +184,19 @@ public class TELEOP_driver_c extends LinearOpMode {
                 case START:
                     if (gamepad1.xWasPressed()) {
                         flickerTime.reset();
-                        robot.flicker.setPosition(1); //go up
+                        robot.flicker.setPosition(0.66); //go up
                         robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
                     }
                     break;
                 case UPWARDS:
-                    if (flickerTime.seconds() >= 0.2) {
+                    if (flickerTime.seconds() >= 0.133) {
                         flickerTime.reset();
                         robot.flicker.setPosition(0); //go down
                         robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
                     }
                     break;
                 case DOWNWARDS:
-                    if (flickerTime.seconds() >= 0.2) {
+                    if (flickerTime.seconds() >= 0.133) {
                         robot.flickState = Invokation_of_a_False_Life.flickStates.START;
                     }
                     break;
@@ -213,7 +213,8 @@ public class TELEOP_driver_c extends LinearOpMode {
 
 
             //-----------------------------------------------UPDATES
-            robot.setHoodPos(robot.hoodState);
+            robot.setHoodPos(robot.hoodState, is_blue_alliance);
+            robot.adjustDecimation();
             robot.localizeViaApril();
             robot.pinpoint.update();
             //-----------------------------------------------UPDATES
@@ -226,6 +227,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             telemetry.addData("| FLY > RPM/90D IA/STR IA + INT IA", "%2f / %2f / %2f + %2f", robot.getFlywheelRPM(), robot.flywheel.getCurrent(CurrentUnit.AMPS), robot.flywheel2.getCurrent(CurrentUnit.AMPS), robot.intake.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("| PPT > IMU-H-R/IMU-H-D/X.Pos/Y.Pos", "%1f/ %1f/ %1f/ %1f", robot.pinpoint.getHeading(AngleUnit.RADIANS), robot.pinpoint.getHeading(AngleUnit.DEGREES), robot.pinpoint.getPosX(DistanceUnit.INCH), robot.pinpoint.getPosY(DistanceUnit.INCH));
             telemetry.addData("| FLCKR > POS/STATE, HOOD > POS", "%1f / %s, $1f", robot.flicker.getPosition(), robot.flickState, robot.hood.getPosition());
+            telemetry.addData("| VISION > SEEN / DECIMATION / FPS", "%d / %d / $f", robot.aprilTPR.getDetections().size(), robot.currentDecimation, robot.visionPortal.getFps());
             telemetry.addData(">>> || I was wrong. You're not greedy... You're bat-shit insane!", "omelettes!");
             telemetry.addData("| ALLIANCE / HYPT FROM / GOAL ∠D / RAW ∠D", "%s / %1f / %1f / %1f", is_blue_alliance ? "BLUE" : "RED", robot.findHypotenuseFromGoal(is_blue_alliance), robot.findIdealGoalAngle(is_blue_alliance), robot.hallucination);
             telemetry.update();
