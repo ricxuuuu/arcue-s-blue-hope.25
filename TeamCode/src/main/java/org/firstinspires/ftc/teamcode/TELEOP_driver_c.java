@@ -4,9 +4,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+import java.util.concurrent.TimeUnit;
 
 //⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⢻⣿⣿⣿⡿⠙⠉⣉⡉⠉⠉⠉⠉⠉⠉⣉⡉⠉⠛⢯⣍⠉⠉⠉⠙⢟⡋⢉⣽⣿⣿⣏⠉⠉⠉⠉⢉⣉⣉⣉⣉⣉⡉⠭⠭⠭⠭
 //⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠳⡄⠀⠀⠀⠀⠀⢸⡼⠟⠁⠀⣠⣾⡿⠀⢀⣤⡀⠀⠀⢶⣿⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⡿⠃⠙⢷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -168,7 +172,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             } else {
                 robot.setFlywheelPower(0);
             }
-            if (in) {
+            if (in && (robot.flickState != (Invokation_of_a_False_Life.flickStates.UPWARDS) && (robot.flickState != Invokation_of_a_False_Life.flickStates.DOWNWARDS))) {
                 robot.intake.setPower(1);
             } else if (out) {
                 robot.intake.setPower(-1);
@@ -223,13 +227,14 @@ public class TELEOP_driver_c extends LinearOpMode {
             //-----------------------------------------------TELEMETRY
             telemetry.addData("----------------˖/ᐠ˵- ⩊ -˵マ----//", "---*");
             telemetry.addData(">>> || sometimes I get a craving for fruit that makes me reminisce", "what~*?");
-            telemetry.addData("| FL/FR/BL/BR DriveTrain-PWR", "%2f / %2f / %2f / %2f", robot.frontLeft.getPower(), robot.frontRight.getPower(), robot.backLeft.getPower(), robot.backRight.getPower());
-            telemetry.addData("| FLY > RPM/90D IA/STR IA + INT IA", "%2f / %2f / %2f + %2f", robot.getFlywheelRPM(), robot.flywheel.getCurrent(CurrentUnit.AMPS), robot.flywheel2.getCurrent(CurrentUnit.AMPS), robot.intake.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("| PPT > IMU-H-R/IMU-H-D/X.Pos/Y.Pos", "%1f/ %1f/ %1f/ %1f", robot.pinpoint.getHeading(AngleUnit.RADIANS), robot.pinpoint.getHeading(AngleUnit.DEGREES), robot.pinpoint.getPosX(DistanceUnit.INCH), robot.pinpoint.getPosY(DistanceUnit.INCH));
-            telemetry.addData("| FLCKR > POS/STATE, HOOD > POS", "%1f / %s, $1f", robot.flicker.getPosition(), robot.flickState, robot.hood.getPosition());
-            telemetry.addData("| VISION > SEEN / DECIMATION / FPS", "%d / %d / $f", robot.aprilTPR.getDetections().size(), robot.currentDecimation, robot.visionPortal.getFps());
+            telemetry.addData("| FL/FR/BL/BR DriveTrain-PWR", "%.2f / %.2f / %.2f / %.2f", robot.frontLeft.getPower(), robot.frontRight.getPower(), robot.backLeft.getPower(), robot.backRight.getPower());
+            telemetry.addData("| FLY > RPM/90D IA/STR IA + INT IA", "%.2f / %.2f / %.2f + %.2f", robot.getFlywheelRPM(), robot.flywheel.getCurrent(CurrentUnit.AMPS), robot.flywheel2.getCurrent(CurrentUnit.AMPS), robot.intake.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("| PPT > IMU-H-R/IMU-H-D/X.Pos/Y.Pos", "%.1f/ %.1f/ %.1f/ %.1f", robot.pinpoint.getHeading(AngleUnit.RADIANS), robot.pinpoint.getHeading(AngleUnit.DEGREES), robot.pinpoint.getPosX(DistanceUnit.INCH), robot.pinpoint.getPosY(DistanceUnit.INCH));
+            telemetry.addData("| FLCKR > POS/STATE, HOOD > POS", "%.1f / %s, %.1f", robot.flicker.getPosition(), robot.flickState, robot.hood.getPosition());
+            telemetry.addData("| VISION > SEEN / DECIMATION / FPS", "%d / %d / %.1f", robot.aprilTPR.getDetections().size(), robot.currentDecimation, robot.visionPortal.getFps());
             telemetry.addData(">>> || I was wrong. You're not greedy... You're bat-shit insane!", "omelettes!");
-            telemetry.addData("| ALLIANCE / HYPT FROM / GOAL ∠D / RAW ∠D", "%s / %1f / %1f / %1f", is_blue_alliance ? "BLUE" : "RED", robot.findHypotenuseFromGoal(is_blue_alliance), robot.findIdealGoalAngle(is_blue_alliance), robot.hallucination);
+            telemetry.addData("a", "%d / %db", (int) robot.visionPortal.getCameraControl(ExposureControl.class).getExposure(TimeUnit.MILLISECONDS), robot.visionPortal.getCameraControl(GainControl.class).getGain());
+            telemetry.addData("| ALLIANCE / HYPT FROM / GOAL ∠D / RAW ∠D", "%s / %.1f / %.1f / %.1f", is_blue_alliance ? "BLUE" : "RED", robot.findHypotenuseFromGoal(is_blue_alliance), robot.findIdealGoalAngle(is_blue_alliance), robot.hallucination);
             telemetry.update();
             //-----------------------------------------------TELEMETRY
         }

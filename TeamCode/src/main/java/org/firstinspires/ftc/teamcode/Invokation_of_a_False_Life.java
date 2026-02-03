@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static java.lang.Thread.sleep;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ftc.InvertedFTCCoordinates;
 import com.pedropathing.ftc.PoseConverter;
@@ -128,8 +130,10 @@ public class Invokation_of_a_False_Life {
 
                 .addProcessor(aprilTPR);
         visionPortal = VPbuilder.build();
+        while (!(visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING)) {
+            try {traumatizeCamera(1, 33);} catch (Exception ignored) {}
+        }
 
-        traumatizeCamera(10, 33);
     }
 
     private void configurePinpoint() {
@@ -149,14 +153,17 @@ public class Invokation_of_a_False_Life {
 
             //exposure
             ExposureControl exposure_to_death = visionPortal.getCameraControl(ExposureControl.class);
-            if (exposure_to_death.getMode() != ExposureControl.Mode.Manual) {
+            while (exposure_to_death.getMode() != ExposureControl.Mode.Manual) {
                 exposure_to_death.setMode(ExposureControl.Mode.Manual);
             }
-            exposure_to_death.setExposure((long)exposure, TimeUnit.MILLISECONDS);
-
+            while (exposure_to_death.getExposure(TimeUnit.MILLISECONDS) != exposure) {
+                exposure_to_death.setExposure((long)exposure, TimeUnit.MILLISECONDS);
+            }
             //gain
             GainControl my_self_benefit = visionPortal.getCameraControl(GainControl.class);
-            my_self_benefit.setGain(gain);
+            while (my_self_benefit.getGain() != gain) {
+                my_self_benefit.setGain(gain);
+            }
 
         }
     }
@@ -220,11 +227,14 @@ public class Invokation_of_a_False_Life {
         double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
 
         if (hypotenuse <= 42) {
-            hoodState = hoodStates.NEAR;
+            //hoodState = hoodStates.NEAR;
+            hoodState = hoodStates.HORIZON_ROSEMARY;
         } else if (hypotenuse > 42 && hypotenuse <= 79) {
-            hoodState = hoodStates.RASPBERRY;
+            //hoodState = hoodStates.RASPBERRY;
+            hoodState = hoodStates.HORIZON_ROSEMARY;
         } else if (hypotenuse >68 && hypotenuse <= 118) {
-            hoodState = hoodStates.FAR;
+            //hoodState = hoodStates.FAR;
+            hoodState = hoodStates.HORIZON_ROSEMARY;
         } else if (hypotenuse > 118) {
             hoodState = hoodStates.FAR;
         }
