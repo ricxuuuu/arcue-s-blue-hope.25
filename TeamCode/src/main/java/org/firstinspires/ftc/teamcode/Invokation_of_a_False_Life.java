@@ -62,7 +62,7 @@ public class Invokation_of_a_False_Life {
     public enum flickStates {START,UPWARDS,DOWNWARDS}
     flickStates flickState = flickStates.START;
 
-    public enum hoodStates {NEAR, RASPBERRY, MID, FAR, HORIZON_ROSEMARY}
+    public enum hoodStates {NEAR, MID, FAR, CHICKEN_RASPBERRY, HORIZON_ROSEMARY}
     hoodStates hoodState = hoodStates.NEAR;
 
     public double dream_of_flight = 1;
@@ -101,7 +101,6 @@ public class Invokation_of_a_False_Life {
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         flywheel.setDirection(DcMotor.Direction.REVERSE);
         flicker.setPosition(0);
-        hood.setPosition(0);
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         flywheel2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -130,10 +129,6 @@ public class Invokation_of_a_False_Life {
 
                 .addProcessor(aprilTPR);
         visionPortal = VPbuilder.build();
-        while (!(visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING)) {
-            try {traumatizeCamera(1, 33);} catch (Exception ignored) {}
-        }
-
     }
 
     private void configurePinpoint() {
@@ -147,27 +142,6 @@ public class Invokation_of_a_False_Life {
 
         pinpoint.resetPosAndIMU();
     }
-
-    private void traumatizeCamera(int exposure, int gain) {
-        if (!(visionPortal == null)) {
-
-            //exposure
-            ExposureControl exposure_to_death = visionPortal.getCameraControl(ExposureControl.class);
-            while (exposure_to_death.getMode() != ExposureControl.Mode.Manual) {
-                exposure_to_death.setMode(ExposureControl.Mode.Manual);
-            }
-            while (exposure_to_death.getExposure(TimeUnit.MILLISECONDS) != exposure) {
-                exposure_to_death.setExposure((long)exposure, TimeUnit.MILLISECONDS);
-            }
-            //gain
-            GainControl my_self_benefit = visionPortal.getCameraControl(GainControl.class);
-            while (my_self_benefit.getGain() != gain) {
-                my_self_benefit.setGain(gain);
-            }
-
-        }
-    }
-
 
     //action methods
     public void drive(double axial, double lateral, double yaw) {
@@ -202,40 +176,31 @@ public class Invokation_of_a_False_Life {
         if (hoodState == hoodStates.NEAR) {
             hood.setPosition(0);
         }
-        if (hoodState == hoodStates.RASPBERRY) {
-            hood.setPosition(0.17);
-        }
         if (hoodState == hoodStates.MID) {
             hood.setPosition(0.4);
         }
         if (hoodState == hoodStates.FAR) {
             hood.setPosition(1);
         }
+        if (hoodState == hoodStates.CHICKEN_RASPBERRY) {
+            hood.setPosition(
+                    (0.01647 * findHypotenuseFromGoal(is_blue_alliance))
+                    - 0.57
+            );
+        }
         if (hoodState == hoodStates.HORIZON_ROSEMARY) {
-            double xx = findHypotenuseFromGoal(is_blue_alliance);
-            double yy = (-0.00006233 * xx * xx) + (0.02062 * xx) - 0.5139;
-            if (yy < 0) {
-                yy = 0;
-            } else if (yy > 1) {
-                yy = 1;
-            }
-            hood.setPosition(yy);
+            hood.setPosition(1);
         }
     }
 
     public void setIdealHoodState(boolean is_blue_alliance) {
         double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
 
-        if (hypotenuse <= 42) {
-            //hoodState = hoodStates.NEAR;
+        if (hypotenuse <= 60) {
+            hoodState = hoodStates.CHICKEN_RASPBERRY;
+        } else if (hypotenuse > 60 && hypotenuse <= 119) {
             hoodState = hoodStates.HORIZON_ROSEMARY;
-        } else if (hypotenuse > 42 && hypotenuse <= 79) {
-            //hoodState = hoodStates.RASPBERRY;
-            hoodState = hoodStates.HORIZON_ROSEMARY;
-        } else if (hypotenuse >68 && hypotenuse <= 118) {
-            //hoodState = hoodStates.FAR;
-            hoodState = hoodStates.HORIZON_ROSEMARY;
-        } else if (hypotenuse > 118) {
+        } else if (hypotenuse >119) {
             hoodState = hoodStates.FAR;
         }
     }
@@ -243,8 +208,10 @@ public class Invokation_of_a_False_Life {
     public void findIdealFlightSpeed(boolean is_blue_alliance) {
         double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
 
-        if (hypotenuse <= 118) {
-            dream_of_flight = 0.84;
+        if (hypotenuse <= 68) {
+            dream_of_flight = 0.73;
+        } else if (hypotenuse > 68 && hypotenuse <= 119) {
+            dream_of_flight = 0.86;  
         } else {
             dream_of_flight = 1;
         }
@@ -287,9 +254,9 @@ public class Invokation_of_a_False_Life {
 
         //find angle to point @goal
         if (is_blue_alliance) {
-            angle = Math.atan2(-72 - pinpoint.getPosY(DistanceUnit.INCH), -72 - pinpoint.getPosX(DistanceUnit.INCH));
+            angle = Math.atan2(-69 - pinpoint.getPosY(DistanceUnit.INCH), -69 - pinpoint.getPosX(DistanceUnit.INCH));
         } else {
-            angle = Math.atan2(72 - pinpoint.getPosY(DistanceUnit.INCH), -72 - pinpoint.getPosX(DistanceUnit.INCH));
+            angle = Math.atan2(69 - pinpoint.getPosY(DistanceUnit.INCH), -69 - pinpoint.getPosX(DistanceUnit.INCH));
         }
 
         return angle;

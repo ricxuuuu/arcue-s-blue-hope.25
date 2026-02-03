@@ -47,8 +47,8 @@ import java.util.concurrent.TimeUnit;
 //⣿⣿⣷⣄⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣇⣝⣿⣇⣷⣀⣀⣐⣈⣂⣁⣸⣀⣿⣍⣀⣄⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣾⣛⣛⣉⣩⣭⣥⣶⣒⣒⣚⣋⣲⣶⣐
 // hopefully one day we may soar the skies much like the birds of flight
 
-@TeleOp(name = "PURPLE // * TELEOP", group = "Linear Op-mode")
-public class TELEOP_flight_tests extends LinearOpMode {
+@TeleOp(name = "TESTING", group = "Linear Op-mode")
+public class TELEOP_tests extends LinearOpMode {
 
     private final Invokation_of_a_False_Life robot = new Invokation_of_a_False_Life();
     //|||||||||||||||||||||||||||||||// ✧ >.<  //summon a false life to do our bidding

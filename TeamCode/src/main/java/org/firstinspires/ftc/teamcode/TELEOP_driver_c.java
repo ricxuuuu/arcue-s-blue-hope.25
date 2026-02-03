@@ -83,7 +83,7 @@ public class TELEOP_driver_c extends LinearOpMode {
         telemetry.addData("10/", "順転と反転");
         telemetry.addData("11/", "それぞれの無限を衝突させることで生成される仮想の質量を押し出す");
         telemetry.addData("12/", "虚式 「茈」");
-        telemetry.addData("13/", "🟣 + 🟣 = (🟣)");
+        telemetry.addData("13/", "🔵 + 🔴 = (🟣)");
         telemetry.update();
         waitForStart();
         //||||||||||||||||||||||||||||||||||||||//
@@ -156,11 +156,9 @@ public class TELEOP_driver_c extends LinearOpMode {
 
             if (gamepad1.dpadLeftWasPressed() && ultima_ratio) {
                 robot.hoodState = Invokation_of_a_False_Life.hoodStates.NEAR;
-            } else if (gamepad1.dpadDownWasPressed()) {
-                robot.hoodState = Invokation_of_a_False_Life.hoodStates.RASPBERRY;
-            } else if (gamepad1.dpadUpWasPressed()) {
+            } else if (gamepad1.dpadUpWasPressed() && ultima_ratio) {
                 robot.hoodState = Invokation_of_a_False_Life.hoodStates.MID;
-            } else if (gamepad1.dpadRightWasPressed()) {
+            } else if (gamepad1.dpadRightWasPressed() && ultima_ratio) {
                 robot.hoodState = Invokation_of_a_False_Life.hoodStates.FAR;
             }
 
@@ -188,12 +186,12 @@ public class TELEOP_driver_c extends LinearOpMode {
                 case START:
                     if (gamepad1.xWasPressed()) {
                         flickerTime.reset();
-                        robot.flicker.setPosition(0.66); //go up
+                        robot.flicker.setPosition(0.73); //go up
                         robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
                     }
                     break;
                 case UPWARDS:
-                    if (flickerTime.seconds() >= 0.133) {
+                    if (flickerTime.seconds() >= 0.177) {
                         flickerTime.reset();
                         robot.flicker.setPosition(0); //go down
                         robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
@@ -233,7 +231,6 @@ public class TELEOP_driver_c extends LinearOpMode {
             telemetry.addData("| FLCKR > POS/STATE, HOOD > POS", "%.1f / %s, %.1f", robot.flicker.getPosition(), robot.flickState, robot.hood.getPosition());
             telemetry.addData("| VISION > SEEN / DECIMATION / FPS", "%d / %d / %.1f", robot.aprilTPR.getDetections().size(), robot.currentDecimation, robot.visionPortal.getFps());
             telemetry.addData(">>> || I was wrong. You're not greedy... You're bat-shit insane!", "omelettes!");
-            telemetry.addData("a", "%d / %db", (int) robot.visionPortal.getCameraControl(ExposureControl.class).getExposure(TimeUnit.MILLISECONDS), robot.visionPortal.getCameraControl(GainControl.class).getGain());
             telemetry.addData("| ALLIANCE / HYPT FROM / GOAL ∠D / RAW ∠D", "%s / %.1f / %.1f / %.1f", is_blue_alliance ? "BLUE" : "RED", robot.findHypotenuseFromGoal(is_blue_alliance), robot.findIdealGoalAngle(is_blue_alliance), robot.hallucination);
             telemetry.update();
             //-----------------------------------------------TELEMETRY
