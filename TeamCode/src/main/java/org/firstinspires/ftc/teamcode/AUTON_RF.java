@@ -13,7 +13,7 @@ public class AUTON_RF extends LinearOpMode {
     private final Invokation_of_a_False_Life robot = new Invokation_of_a_False_Life();
 
     //-----------------------------------------------poses
-    private final Pose startPose = new Pose(121.7,125.8, Math.toRadians(36.2));
+    private final Pose startPose = new Pose(121.7,125.8, Math.toRadians(36.5));
     private final Pose shootPose = new Pose(96,96,Math.toRadians(45));
     private final Pose approachTPose = new Pose(96,87,Math.toRadians(0));
     private final Pose pickupTPose = new Pose(127.7,87,Math.toRadians(0));
@@ -32,7 +32,6 @@ public class AUTON_RF extends LinearOpMode {
     public void runOpMode() {
 
         robot.init(hardwareMap);
-        robot.hood.setPosition(0.3);
 
         robot.follower.setPose(startPose);
         buildPaths();
@@ -44,13 +43,14 @@ public class AUTON_RF extends LinearOpMode {
 
         while (opModeIsActive()) {
 
+            robot.hood.setPosition(0.6);
             robot.follower.update();
             robot.pinpoint.update();
 
             switch (pathState) {
                 case 0:
                     robot.intake.setPower(1);
-                    robot.setFlywheelPower(0.53);
+                    robot.setFlywheelPower(0.81);
                     robot.follower.followPath(scorePre, true);
                     pathState = 1;
                     break;
@@ -66,8 +66,8 @@ public class AUTON_RF extends LinearOpMode {
                     break;
                 case 2:
                     if (!robot.follower.isBusy()) {
-                        robot.setFlywheelPower(0.53);
-                        sleep(888);
+                        robot.setFlywheelPower(0.81);
+                        sleep(1900);
                         tripleShot();
                         robot.intake.setPower(1);
                         robot.setFlywheelPower(0);
@@ -77,8 +77,8 @@ public class AUTON_RF extends LinearOpMode {
                     break;
                 case 3:
                     if (!robot.follower.isBusy()) {
-                        robot.setFlywheelPower(0.53);
-                        sleep(888);
+                        robot.setFlywheelPower(0.81);
+                        sleep(1900);
                         tripleShot();
                         robot.intake.setPower(1);
                         robot.setFlywheelPower(0);
@@ -88,8 +88,8 @@ public class AUTON_RF extends LinearOpMode {
                     break;
                 case 4:
                     if (!robot.follower.isBusy()) {
-                        robot.setFlywheelPower(0.53);
-                        sleep(888);
+                        robot.setFlywheelPower(0.81);
+                        sleep(1900);
                         tripleShot();
                         robot.intake.setPower(1);
                         robot.setFlywheelPower(0);
@@ -105,7 +105,7 @@ public class AUTON_RF extends LinearOpMode {
                     }
                     break;
                 default:
-                    robot.intake.setPower(-1);
+                    robot.intake.setPower(0);
                     break;
 
             }
@@ -167,7 +167,7 @@ public class AUTON_RF extends LinearOpMode {
     }
 
     private void tripleShot() {
-        robot.hood.setPosition(0.3);
+        robot.hood.setPosition(0.6);
         robot.intake.setPower(0);
         oneShot();
         sleep(100);
@@ -185,7 +185,7 @@ public class AUTON_RF extends LinearOpMode {
 
     private void pulseFlywheel() {
         robot.setFlywheelPower(0);
-        robot.setFlywheelPower(0.53);
+        robot.setFlywheelPower(0.81);
     }
 
 }
