@@ -1,57 +1,94 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.bylazar.configurables.annotations.Configurable;
-import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
-import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.HeadingInterpolator;
-import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+//⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⢻⣿⣿⣿⡿⠙⠉⣉⡉⠉⠉⠉⠉⠉⠉⣉⡉⠉⠛⢯⣍⠉⠉⠉⠙⢟⡋⢉⣽⣿⣿⣏⠉⠉⠉⠉⢉⣉⣉⣉⣉⣉⡉⠭⠭⠭⠭
+//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠳⡄⠀⠀⠀⠀⠀⢸⡼⠟⠁⠀⣠⣾⡿⠀⢀⣤⡀⠀⠀⢶⣿⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⡿⠃⠙⢷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+//⠀⠀⢀⠀⠀⠠⢤⣀⠀⣶⢹⢀⡇⠀⠀⠀⠀⣠⠞⠀⠀⠀⠘⠿⠋⠀⠀⠋⠀⠉⠀⠀⠀⠈⠛⠛⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢧⣀⠀⠀⠙⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+//⠀⠀⠀⠀⠢⢄⡀⠈⠉⢙⣾⠮⠍⠙⠓⠲⣦⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣦⠀⠀⠘⣧⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⣀
+//⡀⢐⠐⣲⣤⣀⠉⠓⠂⡞⠀⡰⠚⠙⠓⠲⢼⡦⣀⠀⠀⠈⠛⠲⢤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠘⣇⠀⠀⣈⣀⠀⢀⣔⣶⡖⠒
+//⠁⠀⡄⠀⠉⠛⠿⣶⢰⠃⣰⠁⠀⠀⣀⡴⢋⣥⠿⢓⣲⣾⠿⢍⣉⠐⣻⡤⢠⡀⠓⠦⣄⣀⠀⠀⠀⠀⠀⠀⠀⣀⡤⠂⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⢹⢖⣋⠤⠼⠯⡻⣿⡖⠖⢻
+//⠭⠥⠷⠶⡆⣀⡀⠀⡞⢠⠇⠀⢠⡾⣋⡔⠉⠀⣠⡾⠋⠀⠀⣠⣾⡫⠕⠻⣼⠹⡤⢀⣀⠈⠉⢯⠓⠒⠒⠲⣾⣳⡶⠶⠒⠲⣄⣀⣤⠞⠶⣄⡀⣴⡿⠋⠀⠀⠀⠀⠙⡞⣧⡀⠸
+//⠍⠋⠛⣄⣳⠈⠙⢳⡇⡸⠀⣠⢎⢴⠏⠀⠀⣼⠋⠀⠀⢀⣼⠟⠁⠀⠀⠀⠹⣧⢱⡀⠀⠉⠁⠘⢳⣄⠀⠉⠈⢿⡌⠉⠒⠢⡨⣳⡍⠑⠦⡈⢿⡋⠀⢀⡠⠴⠒⢦⡀⠸⣽⡩⠭
+//⠶⠾⠿⠟⠫⣤⣀⣼⡇⡇⣰⣣⢫⠃⠀⢠⡾⠁⠀⠀⣠⠋⠀⠀⠀⠀⠀⠀⠀⠘⢇⠱⡄⠀⠀⠀⠀⠉⢆⠀⠀⠈⢷⠀⠀⠀⠹⡜⢽⡗⠦⡈⠪⣳⣔⠋⠀⣀⣴⠚⠃⡄⢻⣇⠀
+//⣉⣈⣨⣷⡄⠀⠉⣻⡿⡽⡱⢁⠇⠀⢠⡟⠁⠀⢀⡜⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⡙⢆⠀⠀⠀⠀⠈⢆⠀⠀⠘⣇⠀⠀⠀⢣⠈⢿⡄⠈⠢⡈⡙⢦⡖⠁⠀⠹⡄⠱⡘⣿⠤
+//⠶⢆⡲⣿⣦⠾⠷⢾⣷⡳⠁⡎⠀⢀⡿⠁⠀⣀⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢮⡳⠀⡀⠀⠀⠈⢆⠀⠀⢨⡄⠀⠀⠸⠀⠘⣧⡤⠤⠛⢇⡎⣇⠀⢀⠀⡇⠀⢣⢿⡍
+//⣄⣈⠇⣻⡟⣾⠀⡼⡱⠁⡸⠀⠀⣼⠃⠀⡴⠃⢀⡤⠄⣄⠀⠀⠀⠀⠀⠀⠀⠀⢀⡴⠚⠓⠛⢦⡙⠳⡄⠀⠈⢆⠀⠀⡆⠀⠀⠀⠀⠀⠸⡄⢀⡤⠞⡁⡿⡄⢸⠀⡇⠀⠘⡜⡇
+//⠓⠒⠀⠉⠛⢿⢺⡳⠁⢠⡇⠀⢠⡇⢀⡜⠡⣞⣁⣀⣀⡸⠇⠀⠀⠀⠀⠀⠀⠀⠈⠑⠦⠤⠤⠤⠟⢦⣀⠀⠀⠈⢆⠀⡇⠀⠀⠀⠀⠀⢠⢻⠉⠀⢠⢣⣿⣷⣸⠀⡇⠀⠀⡇⢘
+//⡄⠤⠴⠶⠖⣺⢷⢃⠀⣸⠀⠀⣸⢳⠞⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀⠙⠳⣤⡀⠘⣦⡇⠀⠀⢸⠀⠀⢸⡼⡶⠔⢁⣾⣻⣿⡿⢸⠁⠀⠀⠀⢸
+//⠀⠠⠤⠤⠴⣟⡏⡎⠀⡏⠀⠀⡽⡏⠀⠀⠀⣀⣤⠤⠖⠚⡃⠀⠀⠀⠀⠀⠀⠀⠀⢈⡛⠚⠳⠤⣄⡀⠀⠀⠈⠛⠯⣷⠇⠀⠀⡞⠀⠀⢸⡇⣿⢠⡾⢃⡇⣿⡇⡼⠀⠀⠀⡀⢸
+//⠀⠀⠀⠀⢰⢹⢠⠁⠀⢷⠀⠀⣿⢻⢀⡀⣀⣡⣤⣶⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠈⣽⣿⣶⣦⣄⣀⠀⠀⠀⠀⠀⡟⠀⠀⢠⠇⠀⠀⢸⠃⢸⠋⢠⠞⣼⡟⢱⠇⠀⠀⠀⡇⢸
+//⡲⣄⡀⠀⡟⡇⠀⠀⠀⢸⡂⢰⢸⡞⡟⠛⣿⣿⡿⠿⠛⠉⠁⠀⠲⠀⠀⠀⠀⠀⠀⠀⠙⠻⠿⢿⣿⣿⣿⣷⣦⡄⢠⠀⠀⠀⠈⠀⠀⠀⡎⠀⢸⡒⠚⠚⠛⠓⠛⠶⠦⢤⣈⣁⢸
+//⠉⠳⢭⡳⡇⡇⢠⠀⠀⠀⣧⠈⣧⢻⡇⢀⠌⡅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠛⠃⠀⣠⠃⠀⠀⢀⡀⠀⠀⡸⠁⡄⢸⠣⠤⠖⠒⠒⠒⠦⠤⡄⠀⠉⠙
+//⠀⠀⠰⢯⣇⣧⢸⡄⢠⠀⠈⢦⡈⢿⣄⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡴⠃⣰⠀⢀⠞⢠⠀⡴⠃⣸⠀⢸⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠉
+//⠀⠀⣠⢞⣿⣜⣤⢷⣸⠳⣄⠈⠻⣖⠙⠛⠃⠀⠀⠀⠀⠀⠀⠀⢠⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣞⡴⣺⢃⣴⡏⣠⢏⡴⣡⢶⠇⠀⡟⠛⠓⠆⠐⠒⠁⠀⠀⠀⣀⣠⠴
+//⠒⠞⣟⣛⠓⠚⠿⠬⣿⡇⠈⠙⡖⣾⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣑⣋⣾⠾⠷⠾⣏⣱⣏⢀⣼⣁⡀⠀⣴⠒⣲⡤⣴⠒⠋⠁⠀⠀
+//⡛⠵⢖⣦⢭⣑⠢⠤⣀⡈⠙⠒⠾⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠔⣒⣛⡭⠉⢁⣀⡠⠤⠤⠐⢒⣒⣋⠭⠭⣿⣗⣻⣭⣭⣿⡽⡄⡇⠀⠀⠀⠀⠀
+//⡝⠛⠶⣮⣭⣓⡫⢕⣲⠭⡑⢢⣤⣀⠉⠛⠷⣄⣀⣀⣤⣀⣀⣀⣀⣀⣀⣀⡤⠖⣛⡩⠴⣒⡪⠭⠔⢒⣋⡉⠥⣤⣒⣲⡭⢽⣗⣒⣾⡯⢽⣿⠛⠿⡛⢿⣿⡏⣿⡇⠀⠀⠀⢠⠀
+//⢤⢌⣀⢀⣜⠙⡻⡿⢾⣭⣟⡲⠭⣟⠟⡂⠀⢮⡙⢦⣠⡇⣯⣿⣉⡿⢋⠥⠖⡩⠔⡂⠭⣔⣒⡮⣽⣗⣲⡿⢽⡿⠲⢟⠙⠛⡏⣠⣀⢌⠉⢀⡀⠀⢉⢸⣿⣭⡽⠃⠀⠀⠀⡞⠀
+//⡇⢀⠀⠈⠀⠀⠀⠀⢥⡂⠉⠛⠿⣷⣶⣍⣽⣂⣷⠤⢥⣤⠴⠶⣓⣤⣭⣭⣖⣻⣭⣭⠿⠷⠛⡋⢋⠅⠉⠑⠖⠉⠛⠀⠀⠀⠈⠉⠀⠀⠑⠁⠀⡀⢠⣞⡟⠛⢷⣄⠀⠀⣰⠃⠀
+//⣅⠀⠁⢀⠠⠀⠀⠀⠀⠀⠢⡀⠀⢹⣿⣿⣛⠿⠿⢯⣭⣭⣿⠿⠿⠻⣿⣿⡟⣩⠁⠀⠀⠐⣈⢄⣶⢠⡄⠀⠀⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⡧⣄⣈⠻⣷⣤⡟⠀⠀
+//⡇⢀⠀⠀⢅⢀⠀⠐⠀⠀⠀⠓⠀⠤⠋⢹⡿⠃⡉⠉⠀⠁⠈⣧⡐⠀⢿⣿⡇⠅⠠⠆⠞⠉⠁⠀⠘⢂⠁⠀⢐⠀⡡⢄⠀⣄⣀⠀⠀⠀⠠⠀⠀⢠⡇⣿⣏⠙⠚⠿⣾⣿⣧⡀⠀
+//⡇⠀⠀⠄⣨⣆⠢⠀⢀⠀⠀⠀⠀⠀⢄⣸⡗⡲⠤⠁⣀⠀⠄⠠⠀⡀⢰⠿⣇⠀⠀⡆⠀⠠⣄⣀⠀⠀⠈⠆⠰⡁⠊⢀⣄⢱⠆⠰⠀⠈⠁⠠⣶⡆⣧⣿⣏⡉⠒⢤⣄⡙⢛⣿⣤
+//⢶⣄⠀⠀⠀⠈⠀⢧⡀⠒⡐⠄⠠⡆⡟⣿⡇⠃⠀⠀⠄⠀⠀⠀⠀⠈⢸⠰⣿⣦⡄⠃⠀⠀⠀⠀⡀⠀⠀⢁⠂⠀⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⣇⣿⣿⣟⡉⠘⠳⢾⡻⢶⣍⣬
+//⠀⣽⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠳⣧⣾⡆⠀⠏⠀⠀⡀⠀⢀⠀⠀⢸⣤⣿⡇⠀⠀⠀⠀⠃⠈⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡾⢋⣄⠀⠀⠙⣶⡄⠈⣟⢆⢻⣿
+//⢀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢸⣿⣇⢄⠀⠘⠦⣀⠀⠀⠀⠀⠈⣿⢻⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣕⠋⠒⣉⣀⠀⡿⣷⠀⢹⠘⡆⣯
+//⢿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡈⣿⣿⣘⡖⠶⠒⠶⠦⠔⠂⣶⠰⣿⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢽⣦⡬⢤⣒⣪⣇⣇⣴⣻⠦⠿⣾
+//⣿⣿⣷⣄⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣇⣝⣿⣇⣷⣀⣀⣐⣈⣂⣁⣸⣀⣿⣍⣀⣄⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣾⣛⣛⣉⣩⣭⣥⣶⣒⣒⣚⣋⣲⣶⣐
+// hopefully one day we may soar the skies much like the birds of flight
 
-@TeleOp(name = "PURPLE // * TELEOP driver-c", group = "Linear Op-mode")
+@TeleOp(name = "PURPLE // * TELEOP", group = "Linear Op-mode")
 public class TELEOP_driver_c extends LinearOpMode {
 
     private final Invokation_of_a_False_Life robot = new Invokation_of_a_False_Life();
+    //|||||||||||||||||||||||||||||||// ✧ >.<  //summon a false life to do our bidding
 
     @Override
     public void runOpMode() {
-        robot.init(hardwareMap); // Initialize robot hardware
-        boolean is_blue_alliance = false; //to know which alliance you are on for auto speed/fly
 
-        //-----------------------------------------------INTAKE/FLY PREP
+        //-----------------------------------------------PREP
+        robot.init(hardwareMap);
+        robot.localizeViaApril();
+
         boolean fly = false;
         boolean in = false;
         boolean out = false;
         boolean follower_control;
         boolean ultima_ratio = false;
+        boolean is_blue_alliance = false;
 
         //start up a timer for flicker use
         ElapsedTime flickerTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
-        //-----------------------------------------------INTAKE/FLY PREP
-
-        //get ready to start
-        robot.pinpoint.setHeading(0, AngleUnit.RADIANS);
-        robot.localizeViaApril();
-        telemetry.addData("Status", "Initialized");
+        //-----------------------------------------------PREP
+        //||||||||||||||||||||||||||||||||||||||//
+        telemetry.addData("01/", "ごめん あまない 俺は今お前のために怒ってない");
+        telemetry.addData("02/", "誰も憎んじゃいない");
+        telemetry.addData("03/", "今はただただ この世界が心地いい");
+        telemetry.addData("04/", "天上天下 唯我独尊");
+        telemetry.addData("05/", "代々伝わる送電の術式のメリットは取説があること");
+        telemetry.addData("06/", "デメリットは術式の情報が漏れやすいこと");
+        telemetry.addData("07/", "あんた全員家の人間だろう");
+        telemetry.addData("08/", "無限呪術のことはよく知ってるわけだない");
+        telemetry.addData("09/", "だがこれは 五条家の中でもごく一部の人間しか知ら");
+        telemetry.addData("10/", "順転と反転");
+        telemetry.addData("11/", "それぞれの無限を衝突させることで生成される仮想の質量を押し出す");
+        telemetry.addData("12/", "虚式 「茈」");
+        telemetry.addData("13/", "🟣 + 🟣 = (🟣)");
         telemetry.update();
         waitForStart();
+        //||||||||||||||||||||||||||||||||||||||//
 
-        // runs until the stop button is pressed ---------------------------------------------------
+        //------------------------------------------------------------------------------------------
         while (opModeIsActive()) {
             robot.follower.update();
             follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13;
+
 
             //-----------------------------------------------DRIVETRAIN
             if (!follower_control) {
@@ -82,6 +119,8 @@ public class TELEOP_driver_c extends LinearOpMode {
             }
             //-----------------------------------------------DRIVETRAIN
 
+
+            //-----------------------------------------------THE LAST RESORT
             if (!ultima_ratio) {
                 if (!gamepad1.isRumbling()) {
                     gamepad1.rumble(0.2, 0.2, 1333);
@@ -91,6 +130,8 @@ public class TELEOP_driver_c extends LinearOpMode {
             } else {
                 gamepad1.stopRumble();
             }
+            //-----------------------------------------------THE LAST RESORT
+
 
             //-----------------------------------------------INTAKE/FLY
             //player manual control of variables
@@ -109,7 +150,7 @@ public class TELEOP_driver_c extends LinearOpMode {
                 in = false;
             }
 
-            if (gamepad1.dpadLeftWasPressed()) {
+            if (gamepad1.dpadLeftWasPressed() && ultima_ratio) {
                 robot.hoodState = Invokation_of_a_False_Life.hoodStates.NEAR;
             } else if (gamepad1.dpadDownWasPressed()) {
                 robot.hoodState = Invokation_of_a_False_Life.hoodStates.RASPBERRY;
@@ -136,7 +177,6 @@ public class TELEOP_driver_c extends LinearOpMode {
             }
 
             //-----------------------------------------------INTAKE/FLY
-
 
 
             //-----------------------------------------------FLICK SERVO FSM
@@ -180,28 +220,14 @@ public class TELEOP_driver_c extends LinearOpMode {
 
 
             //-----------------------------------------------TELEMETRY
-            telemetry.addData("---------------------------//", "---*");
-            telemetry.addData("sometimes I get a craving for fruit that", "what~*");
-            telemetry.addData("FL_DT-Power", robot.frontLeft.getPower());
-            telemetry.addData("FR_DT-Power", robot.frontRight.getPower());
-            telemetry.addData("BL_DT-Power", robot.backLeft.getPower());
-            telemetry.addData("BR_DT-Power", robot.backRight.getPower());
-            telemetry.addData("RA_FLY-RPM", robot.getFlywheelRPM());
-            telemetry.addData("RA_FLY-Current", robot.flywheel.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("STR_FLY-Current", robot.flywheel2.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("INT-Current", robot.intake.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("PPT_IMU-Heading, FTC-COORD-R", robot.pinpoint.getHeading(AngleUnit.RADIANS));
-            telemetry.addData("PPT_IMU-heading, FTC-COORD-D", robot.pinpoint.getHeading(AngleUnit.DEGREES));
-            telemetry.addData("follower-heading", robot.follower.getHeading());
-            telemetry.addData("PPT-X.pos, FTC-COORD", robot.pinpoint.getPosX(DistanceUnit.INCH));
-            telemetry.addData("PPT-Y.pos, FTC-COORD", robot.pinpoint.getPosY(DistanceUnit.INCH));
-            telemetry.addData("FLICKER-POS", robot.flicker.getPosition());
-            telemetry.addData("FLICKER-STATE", robot.flickState);
-            telemetry.addData("HOOD-POS", robot.hood.getPosition());
-            telemetry.addData("ALLIANCE BLUE?", is_blue_alliance);
-            telemetry.addData("HYPT-FROM", robot.findHypotenuseFromGoal(is_blue_alliance));
-            telemetry.addData("G-Goal Angle", robot.findIdealGoalAngle(is_blue_alliance));
-            telemetry.addData("RAW-g_angle", robot.hallucination);
+            telemetry.addData("----------------˖/ᐠ˵- ⩊ -˵マ----//", "---*");
+            telemetry.addData(">>> || sometimes I get a craving for fruit that makes me reminisce", "what~*?");
+            telemetry.addData("| FL/FR/BL/BR DriveTrain-PWR", "%2f / %2f / %2f / %2f", robot.frontLeft.getPower(), robot.frontRight.getPower(), robot.backLeft.getPower(), robot.backRight.getPower());
+            telemetry.addData("| FLY > RPM/90D IA/STR IA + INT IA", "%2f / %2f / %2f + %2f", robot.getFlywheelRPM(), robot.flywheel.getCurrent(CurrentUnit.AMPS), robot.flywheel2.getCurrent(CurrentUnit.AMPS), robot.intake.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("| PPT > IMU-H-R/IMU-H-D/X.Pos/Y.Pos", "%1f/ %1f/ %1f/ %1f", robot.pinpoint.getHeading(AngleUnit.RADIANS), robot.pinpoint.getHeading(AngleUnit.DEGREES), robot.pinpoint.getPosX(DistanceUnit.INCH), robot.pinpoint.getPosY(DistanceUnit.INCH));
+            telemetry.addData("| FLCKR > POS/STATE, HOOD > POS", "%1f / %s, $1f", robot.flicker.getPosition(), robot.flickState, robot.hood.getPosition());
+            telemetry.addData(">>> || I was wrong. You're not greedy... You're bat-shit insane!", "omelettes!");
+            telemetry.addData("| ALLIANCE / HYPT FROM / GOAL ∠D / RAW ∠D", "%s / %1f / %1f / %1f", is_blue_alliance ? "BLUE" : "RED", robot.findHypotenuseFromGoal(is_blue_alliance), robot.findIdealGoalAngle(is_blue_alliance), robot.hallucination);
             telemetry.update();
             //-----------------------------------------------TELEMETRY
         }

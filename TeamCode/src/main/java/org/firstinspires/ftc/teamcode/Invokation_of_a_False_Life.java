@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.util.Size;
-
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ftc.InvertedFTCCoordinates;
 import com.pedropathing.ftc.PoseConverter;
@@ -12,21 +10,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
@@ -68,8 +60,10 @@ public class Invokation_of_a_False_Life {
 
     public double dream_of_flight = 1;
 
-    Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 72, 72, AngleUnit. DEGREES, -90);
+    Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 72, 72, AngleUnit. DEGREES, 0);
     Pose f_startingPose = PoseConverter.pose2DToPose(startingPose, InvertedFTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
+    //im not sure if needed but will be overwritten pretty much immediately anyway
+
     private final Position cameraPosition = new Position(DistanceUnit.MM, 133.550, 83.102, 256.042, 0);
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, 72.029, 0, 0);
 
@@ -77,32 +71,17 @@ public class Invokation_of_a_False_Life {
 
     //initialization methods
     public void init(HardwareMap hwMap){
-        //drivetrain
+        //actuator hardware-map
         frontLeft = hwMap.get(DcMotor.class, FRONT_LEFT);
         frontRight = hwMap.get(DcMotor.class, FRONT_RIGHT);
         backLeft   = hwMap.get(DcMotor.class, BACK_LEFT);
         backRight  = hwMap.get(DcMotor.class, BACK_RIGHT);
-        //flywheel and intake
         flywheel = hwMap.get(DcMotorEx.class, FLYWHEEL);
         flywheel2 = hwMap.get(DcMotorEx.class, FLYWHEEL2);
         intake = hwMap.get(DcMotorEx.class, INTAKE);
-        //servos
         hood = hwMap.get(Servo.class, HOOD);
         flicker = hwMap.get(Servo.class, FLICKER);
-
-        //IMU
-        pinpoint= hwMap.get(GoBildaPinpointDriver.class, PINPOINT);
-        configurePinpoint();
-        pinpoint.setPosition(startingPose);
-
-        //motor/servo directions/position
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
-        flywheel.setDirection(DcMotor.Direction.REVERSE);
-        flicker.setPosition(0);
-        hood.setPosition(0);
-
-        //zero power behaviour
+        //actuator zero-power
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -110,17 +89,26 @@ public class Invokation_of_a_False_Life {
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        //actuator other
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        flywheel.setDirection(DcMotor.Direction.REVERSE);
+        flicker.setPosition(0);
+        hood.setPosition(0);
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         flywheel2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        flywheel.setVelocityPIDFCoefficients(5.0, 0.1, 0.0, 24);
-        flywheel2.setVelocityPIDFCoefficients(5.0, 0.1, 0.0, 24);
 
+        //pinpoint init
+        pinpoint= hwMap.get(GoBildaPinpointDriver.class, PINPOINT);
+        configurePinpoint();
+        pinpoint.setPosition(startingPose);
+
+        //pedropath init
         follower = Constants.createFollower(hwMap);
         follower.setStartingPose(f_startingPose);
         follower.updatePose();
 
-        //vision things
+        //vision build
         aprilTPR = new AprilTagProcessor.Builder()
                 .setCameraPose(cameraPosition, cameraOrientation)
                 //.setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
@@ -138,19 +126,14 @@ public class Invokation_of_a_False_Life {
     }
 
     private void configurePinpoint() {
-        //x-off = how left the forward pod is from the tracking point
-        //y-off = how forward the strafe pod is from the tracking point
         pinpoint.setOffsets(-119.227, 27.854, DistanceUnit.MM);
 
-        //set the encoder type to the gobilda 4-arm pods used on #3.
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
-        //set the directions of the encoders, first the x encoder then the y encoder
         pinpoint.setEncoderDirections
                 (GoBildaPinpointDriver.EncoderDirection.REVERSED,
                         GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
-        //recalibrate, see 'SensorGoBildaPinpoint' for reasoning.
         pinpoint.resetPosAndIMU();
     }
 
