@@ -47,42 +47,26 @@ public class AUTON_RC extends LinearOpMode {
 
             switch (pathState) {
                 case 0:
-                    robot.intake.setPower(1);
-                    robot.setFlywheelPower(1);
                     robot.follower.followPath(scorePre, true);
                     pathState = 1;
                     break;
                 case 1:
                     if (!robot.follower.isBusy()) {
-                        pulseFlywheel();
-                        sleep(300);
-                        tripleShot();
-                        robot.intake.setPower(1);
-                        robot.setFlywheelPower(0);
+                        sleep(3000);
                         robot.follower.followPath(scoreB, true);
                         pathState = 2;
                     }
                     break;
                 case 2:
                     if (!robot.follower.isBusy()) {
-                        robot.follower.turnTo(Math.toRadians(60));
-                        robot.setFlywheelPower(1);
-                        sleep(2100);
-                        tripleShot();
-                        robot.intake.setPower(1);
-                        robot.setFlywheelPower(0);
+                        sleep(3000);
                         robot.follower.followPath(scoreM, true);
                         pathState = 3;
                     }
                     break;
                 case 3:
                     if (!robot.follower.isBusy()) {
-                        robot.follower.turnTo(Math.toRadians(56));
-                        robot.setFlywheelPower(1);
-                        sleep(2100);
-                        tripleShot();
-                        robot.intake.setPower(1);
-                        robot.setFlywheelPower(0);
+                        sleep(3000);
                         robot.follower.followPath(runAway, true);
                         pathState = 4;
                     }
@@ -150,12 +134,10 @@ public class AUTON_RC extends LinearOpMode {
         robot.hood.setPosition(1);
         robot.intake.setPower(0);
         oneShot();
-        sleep(100);
         robot.intake.setPower(1);
         sleep(1000);
         robot.intake.setPower(0);
         oneShot();
-        sleep(100);
         robot.intake.setPower(1);
         sleep(1000);
         robot.intake.setPower(0.5);
@@ -165,7 +147,17 @@ public class AUTON_RC extends LinearOpMode {
 
     private void pulseFlywheel() {
         robot.setFlywheelPower(0);
+        sleep(50);
         robot.setFlywheelPower(1);
+    }
+
+    private void interfaceFTB() {
+        double moonlight = robot.findTargetBearing(true) + robot.follower.getHeading();
+        while (Math.abs(robot.follower.getHeading() - moonlight) > 3) {
+            robot.follower.turnTo(robot.follower.getHeading() + robot.findTargetBearing(true));
+            robot.follower.update();
+        }
+
     }
 
 }

@@ -132,7 +132,7 @@ public class Invokation_of_a_False_Life {
     }
 
     private void configurePinpoint() {
-        pinpoint.setOffsets(-119.227, 27.854, DistanceUnit.MM);
+        pinpoint.setOffsets(-119.227, 33.854, DistanceUnit.MM);
 
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
@@ -196,9 +196,9 @@ public class Invokation_of_a_False_Life {
     public void setIdealHoodState(boolean is_blue_alliance) {
         double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
 
-        if (hypotenuse <= 60) {
+        if (hypotenuse <= 64) {
             hoodState = hoodStates.CHICKEN_RASPBERRY;
-        } else if (hypotenuse > 60 && hypotenuse <= 119) {
+        } else if (hypotenuse > 64 && hypotenuse <= 119) {
             hoodState = hoodStates.HORIZON_ROSEMARY;
         } else if (hypotenuse >119) {
             hoodState = hoodStates.FAR;
@@ -211,7 +211,7 @@ public class Invokation_of_a_False_Life {
         if (hypotenuse <= 68) {
             dream_of_flight = 0.73;
         } else if (hypotenuse > 68 && hypotenuse <= 119) {
-            dream_of_flight = 0.86;  
+            dream_of_flight = 0.86;
         } else {
             dream_of_flight = 1;
         }
@@ -287,6 +287,25 @@ public class Invokation_of_a_False_Life {
                             translateTCHeading(false, hallucination)));
                 }
             }
+        }
+    }
+
+    public double findTargetBearing(boolean is_red) {
+        List<AprilTagDetection> currentDetections = aprilTPR.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if (is_red && detection.id == 24) {
+                hallucination = detection.ftcPose.bearing;
+                hallucination -= 3;
+            }
+            if (!is_red && detection.id == 20) {
+                hallucination = detection.ftcPose.bearing;
+                hallucination += 3;
+            }
+        }
+        if (hallucination < 45 && hallucination > -45) {
+            return Math.toRadians(hallucination);
+        } else {
+            return 0;
         }
     }
 
