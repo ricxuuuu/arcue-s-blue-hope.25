@@ -15,7 +15,7 @@ public class AUTN_bPX extends LinearOpMode {
 
     //-----------------------------------------------poses
     private final Pose startPose = new Pose(56.22,8.35, Math.toRadians(90));
-    private final Pose shootPose = new Pose(57.4,16.3,Math.toRadians(113));
+    private final Pose shootPose = new Pose(57.4,15.7,Math.toRadians(113));
     private final Pose approachMPose = new Pose(48,53,Math.toRadians(180));
     private final Pose pickupMPose = new Pose(13,51,Math.toRadians(180));
     private final Pose approachBPose = new Pose(48,34.7,Math.toRadians(180));

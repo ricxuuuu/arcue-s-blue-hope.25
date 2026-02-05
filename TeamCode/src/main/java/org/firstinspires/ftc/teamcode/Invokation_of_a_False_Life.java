@@ -207,7 +207,9 @@ public class Invokation_of_a_False_Life {
 
         if (hypotenuse <= 68) {
             dream_of_flight = 0.73;
-        } else if (hypotenuse > 68 && hypotenuse <= 119) {
+        } else if (hypotenuse > 68 && hypotenuse <= 75) {
+            dream_of_flight = 0.81;
+        } else if (hypotenuse > 75 && hypotenuse <= 119){
             dream_of_flight = 0.86;
         } else {
             dream_of_flight = 1;
