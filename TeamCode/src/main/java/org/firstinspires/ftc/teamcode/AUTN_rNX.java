@@ -226,7 +226,7 @@ public class AUTN_rNX extends LinearOpMode {
                     flickerTime.reset();
                     robot.flicker.setPosition(0.73); //go up
                     robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
-                } else if (shotsFired == 0 && (revTime.seconds() > 2.3)) {
+                } else if (shotsFired <= 0 && (revTime.seconds() > 2.3)) {
                     flickerTime.reset();
                     robot.flicker.setPosition(0.73); //go up
                     robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
