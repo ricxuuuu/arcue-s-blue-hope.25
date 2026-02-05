@@ -225,7 +225,11 @@ public class AUTN_bPX extends LinearOpMode {
     private void shootToKill(ElapsedTime flickerTime, ElapsedTime revTime) {
         switch (robot.flickState) {
             case START:
-                if (shotsFired < 4 && (revTime.seconds() > 1.7)) {
+                if (shotsFired < 4 && shotsFired != 0 && (revTime.seconds() > 1.7)) {
+                    flickerTime.reset();
+                    robot.flicker.setPosition(0.73); //go up
+                    robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
+                } else if (shotsFired == 0 && (revTime.seconds() > 2.3)) {
                     flickerTime.reset();
                     robot.flicker.setPosition(0.73); //go up
                     robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
