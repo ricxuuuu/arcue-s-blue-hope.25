@@ -120,10 +120,10 @@ public class Invokation_of_a_False_Life {
         aprilTPR.setDecimation(1);
         VisionPortal.Builder VPbuilder = new VisionPortal.Builder()
                 .setCamera(hwMap.get(WebcamName.class, "webcam"))
-                .setCameraResolution(new Size(864, 480))
                 .enableLiveView(false)
                 .addProcessor(aprilTPR);
         visionPortal = VPbuilder.build();
+
     }
 
     private void configurePinpoint() {
@@ -304,15 +304,14 @@ public class Invokation_of_a_False_Life {
         return angle_given; //heading 0 facing audience / north if X is vert.
     }
 
-    public double findAprilStarBearing(boolean red) {
+    public double findAprilStarBearing(boolean red) { //currently unused
         List<AprilTagDetection> currentDetections = aprilTPR.getDetections();
         for (AprilTagDetection detection : currentDetections) {
             if (red && detection.id == 24) {
                 hallucination = detection.ftcPose.bearing;
                 hallucination -= 3;
                 break;
-            }
-            if (!red && detection.id == 20) {
+            } else if (!red && detection.id == 20) {
                 hallucination = detection.ftcPose.bearing;
                 hallucination += 3;
                 break;

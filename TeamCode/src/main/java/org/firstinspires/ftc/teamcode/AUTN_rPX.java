@@ -15,18 +15,18 @@ public class AUTN_rPX extends LinearOpMode {
 
     //-----------------------------------------------poses
     private final Pose startPose = new Pose(87.78,8.35, Math.toRadians(90));
-    private final Pose shootPose = new Pose(88,15.3,Math.toRadians(67));
+    private final Pose shootPose = new Pose(86.6,17.3,Math.toRadians(67));
     private final Pose approachMPose = new Pose(96,53,Math.toRadians(0));
-    private final Pose pickupMPose = new Pose(133,51,Math.toRadians(0));
-    private final Pose approachBPose = new Pose(96,36,Math.toRadians(0));
-    private final Pose pickupBPose = new Pose(133,36,Math.toRadians(0));
+    private final Pose pickupMPose = new Pose(131,51,Math.toRadians(0));
+    private final Pose approachBPose = new Pose(96,34.7,Math.toRadians(0));
+    private final Pose pickupBPose = new Pose(131,34.7,Math.toRadians(0));
     private final Pose leave = new Pose(120, 24, Math.toRadians(0));
 
     private PathChain scorePre ,scoreB, scoreM, runAway;
-    ElapsedTime flickerTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
     int pathState = 0;
     int shotsFired = 0;
     boolean in = false;
+    boolean pulsed = false;
     double intuition = 0;
     //-----------------------------------------------poses
 
@@ -43,6 +43,8 @@ public class AUTN_rPX extends LinearOpMode {
         robot.init(hardwareMap);
         robot.follower.setPose(startPose);
         buildPaths();
+        ElapsedTime flickerTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
+        ElapsedTime revTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
         //-----------------------------------------------PREP
         //||||||||||||||||||||||||||||||||||||||//
@@ -57,22 +59,20 @@ public class AUTN_rPX extends LinearOpMode {
         sleep(888);      //FAR ZONE HOOD ADJUST
         //||||||||||||||||||||||||||||||||||||||//
 
-        //------------------------------------------------------------------------------------------
+        //----------------------------------------------------------------------------------------
         while (opModeIsActive()) {
 
             switch (pathState) {
                 case 0:
                     robot.follower.followPath(scorePre, true);
                     in = true;
+                    robot.intake.setPower(0.34);
                     pathState = 1;
                     break;
                 case 1:
                     if (!robot.follower.isBusy()) {
-                        actOnTheGut();
-                        if (Math.abs(intuition) < Math.toRadians(3)) {
-                            shootToKill();
-                        }
-                        if (shotsFired >= 3) {
+                        shootToKill(flickerTime, revTime);
+                        if (shotsFired >= 4) {
                             robot.follower.followPath(scoreB, true);
                             pathState = 2;
                             reload();
@@ -81,11 +81,8 @@ public class AUTN_rPX extends LinearOpMode {
                     break;
                 case 2:
                     if (!robot.follower.isBusy()) {
-                        actOnTheGut();
-                        if (Math.abs(intuition) < Math.toRadians(3)) {
-                            shootToKill();
-                        }
-                        if (shotsFired >= 3) {
+                        shootToKill(flickerTime, revTime);
+                        if (shotsFired >= 4) {
                             robot.follower.followPath(scoreM, true);
                             pathState = 3;
                             reload();
@@ -94,14 +91,11 @@ public class AUTN_rPX extends LinearOpMode {
                     break;
                 case 3:
                     if (!robot.follower.isBusy()) {
-                        actOnTheGut();
-                        if (Math.abs(intuition) < Math.toRadians(3)) {
-                            shootToKill();
-                        }
+                        shootToKill(flickerTime, revTime);
                         if (shotsFired >= 3) {
                             robot.follower.followPath(runAway, true);
                             pathState = 4;
-                            in = false;
+                            reload();
                         }
                     }
                     break;
@@ -118,6 +112,7 @@ public class AUTN_rPX extends LinearOpMode {
 
             //-----------------------------------------------UPDATES
             manageCalories();
+            flightEnergyConservation(revTime);
             robot.follower.update();
             robot.pinpoint.update();
             //-----------------------------------------------UPDATES
@@ -127,6 +122,8 @@ public class AUTN_rPX extends LinearOpMode {
             telemetry.addData("---------------------//STATUS-RED", "hunting...");
             telemetry.addData("INTUITION", intuition);
             telemetry.addData("FIRED", shotsFired);
+            telemetry.addData("F_STATE/POS", "%s / %.2f", robot.flickState, robot.flicker.getPosition());
+            telemetry.addData("F_TIME", flickerTime.seconds());
             telemetry.addData("CASE", pathState);
             telemetry.addData("X.IN", robot.follower.getPose().getX());
             telemetry.addData("Y.IN", robot.follower.getPose().getY());
@@ -167,9 +164,27 @@ public class AUTN_rPX extends LinearOpMode {
                 .build();
     }
 
+    private void pulsar() {
+        if (!pulsed) {
+            pulsed = true;
+            robot.flywheel.setPower(0);
+            sleep(1);
+            robot.flywheel.setPower(1);
+        }
+    }
+    private void flightEnergyConservation(ElapsedTime revTime) {
+        if (robot.follower.isBusy()) {
+            robot.setFlywheelPower(0);
+        } else if (robot.flywheel.getPower() == 0){
+            robot.setFlywheelPower(1);
+            revTime.reset();
+        }
+    }
     private void manageCalories() {
         if (in && (robot.flickState != (Invokation_of_a_False_Life.flickStates.UPWARDS) && (robot.flickState != Invokation_of_a_False_Life.flickStates.DOWNWARDS))) {
-            robot.intake.setPower(1);
+            robot.intake.setPower(0.8);
+        } else if (in && (robot.flickState == Invokation_of_a_False_Life.flickStates.DOWNWARDS)) {
+            robot.intake.setPower(0.5);
         } else {
             robot.intake.setPower(0);
         }
@@ -180,10 +195,10 @@ public class AUTN_rPX extends LinearOpMode {
         robot.follower.turnTo(intuition + robot.follower.getHeading());
     }
 
-    private void shootToKill() {
+    private void shootToKill(ElapsedTime flickerTime, ElapsedTime revTime) {
         switch (robot.flickState) {
             case START:
-                if (shotsFired < 3) {
+                if (shotsFired < 4 && (revTime.seconds() > 1.7)) {
                     flickerTime.reset();
                     robot.flicker.setPosition(0.73); //go up
                     robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
@@ -199,25 +214,25 @@ public class AUTN_rPX extends LinearOpMode {
             case DOWNWARDS:
                 if (flickerTime.seconds() >= 0.133) {
                     flickerTime.reset();
-                    robot.flickState = Invokation_of_a_False_Life.flickStates.MOONLIGHT;
                     shotsFired += 1;
+                    robot.flickState = Invokation_of_a_False_Life.flickStates.MOONLIGHT;
                 }
                 break;
             case MOONLIGHT:
-                if (shotsFired < 2 && (flickerTime.seconds() >= 1.36)) {
+                if ((shotsFired < 2) && (flickerTime.seconds() >= 0.888)) {
                     robot.flickState = Invokation_of_a_False_Life.flickStates.START;
-                    break;
-                } else if (shotsFired == 2 && (flickerTime.seconds() >= 2.1)) {
+                } else if ((shotsFired >= 2) && (flickerTime.seconds() >= 1.3)) {
                     robot.flickState = Invokation_of_a_False_Life.flickStates.START;
-                    break;
                 }
+                break;
             default:
-                robot.flickState = Invokation_of_a_False_Life.flickStates.START;
+                break;
         }
     }
 
     private void reload() {
         shotsFired = 0;
+        pulsed = false;
     }
 
 }
