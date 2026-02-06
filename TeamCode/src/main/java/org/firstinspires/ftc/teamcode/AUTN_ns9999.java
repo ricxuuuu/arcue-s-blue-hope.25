@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name = "AUTON//red pos(x) ⸙", group = "Linear Op-mode")
-public class AUTN_rPX extends LinearOpMode {
+@Autonomous(name = "AUTON//red pos(x) 9999  ⸙", group = "Linear Op-mode")
+public class AUTN_ns9999 extends LinearOpMode {
 
     private final Invokation_of_a_False_Life robot = new Invokation_of_a_False_Life();
     //|||||||||||||||||||||||||||||||// ✧ >.<  //summon a false life to do our bidding
@@ -16,13 +16,11 @@ public class AUTN_rPX extends LinearOpMode {
     //-----------------------------------------------poses
     private final Pose startPose = new Pose(87.78,8.35, Math.toRadians(90));
     private final Pose shootPose = new Pose(86.6,15.7,Math.toRadians(67));
-    private final Pose approachMPose = new Pose(96,53,Math.toRadians(0));
-    private final Pose pickupMPose = new Pose(131,51,Math.toRadians(0));
     private final Pose approachBPose = new Pose(96,34.7,Math.toRadians(0));
     private final Pose pickupBPose = new Pose(131,34.7,Math.toRadians(0));
     private final Pose leave = new Pose(120, 24, Math.toRadians(0));
 
-    private PathChain scorePre ,scoreB, scoreM, runAway;
+    private PathChain scorePre ,scoreB, runAway;
     int pathState = 0;
     int shotsFired = 0;
     boolean in = false;
@@ -56,7 +54,7 @@ public class AUTN_rPX extends LinearOpMode {
         //||||||||||||||||||||||||||||||||||||||//
         robot.hood.setPosition(1);  //FAR ZONE HOOD ADJUST
         //robot.setFlywheelPower(1);
-        sleep(888);      //FAR ZONE HOOD ADJUST
+        sleep(1000);      //FAR ZONE HOOD ADJUST
         //||||||||||||||||||||||||||||||||||||||//
 
         //----------------------------------------------------------------------------------------
@@ -85,28 +83,19 @@ public class AUTN_rPX extends LinearOpMode {
                     if (!robot.follower.isBusy()) {
                         shootToKill(flickerTime, revTime);
                         if (shotsFired >= 4) {
-                            robot.follower.followPath(scoreM, true);
+                            robot.follower.followPath(runAway, true);
                             pathState = 3;
-                            reload();
                         }
                     }
                     break;
                 case 3:
-                    if (!robot.follower.isBusy()) {
-                        shootToKill(flickerTime, revTime);
-                        if (shotsFired >= 3) {
-                            robot.follower.followPath(runAway, true);
-                            pathState = 4;
-                        }
-                    }
-                    break;
-                case 4:
                     if (!robot.follower.isBusy()) {
                         pathState = -999;
                     }
                     break;
                 default:
                     robot.intake.setPower(0);
+                    robot.setFlywheelPower(0);
                     break;
 
             }
@@ -186,15 +175,6 @@ public class AUTN_rPX extends LinearOpMode {
                 .setLinearHeadingInterpolation(pickupBPose.getHeading(), shootPose.getHeading())
                 .build();
 
-        scoreM = robot.follower.pathBuilder()
-                .addPath(new BezierLine(shootPose, approachMPose))
-                .setLinearHeadingInterpolation(shootPose.getHeading(), approachMPose.getHeading())
-                .addPath(new BezierLine(approachMPose, pickupMPose))
-                .setTangentHeadingInterpolation()
-                .addPath(new BezierLine(pickupMPose, shootPose))
-                .setLinearHeadingInterpolation(pickupMPose.getHeading(), shootPose.getHeading())
-                .build();
-
         runAway = robot.follower.pathBuilder()
                 .addPath(new BezierLine(shootPose, leave))
                 .setTangentHeadingInterpolation()
@@ -212,7 +192,7 @@ public class AUTN_rPX extends LinearOpMode {
 
     private void manageCalories() {
         if (in && (robot.flickState != (Invokation_of_a_False_Life.flickStates.UPWARDS) && (robot.flickState != Invokation_of_a_False_Life.flickStates.DOWNWARDS))) {
-            robot.intake.setPower(0.8);
+            robot.intake.setPower(0.77);
         } else if (in && (robot.flickState == Invokation_of_a_False_Life.flickStates.DOWNWARDS)) {
             robot.intake.setPower(0.4);
         } else {
@@ -228,7 +208,7 @@ public class AUTN_rPX extends LinearOpMode {
     private void shootToKill(ElapsedTime flickerTime, ElapsedTime revTime) {
         switch (robot.flickState) {
             case START:
-                if (shotsFired < 4 && shotsFired != 0 && (revTime.seconds() > 1.7)) {
+                if (shotsFired < 4 && shotsFired != 0 && (revTime.seconds() > 2.5)) {
                     flickerTime.reset();
                     robot.flicker.setPosition(0.73); //go up
                     robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
@@ -253,9 +233,9 @@ public class AUTN_rPX extends LinearOpMode {
                 }
                 break;
             case MOONLIGHT:
-                if ((shotsFired < 2) && (flickerTime.seconds() >= 0.888)) {
+                if ((shotsFired < 2) && (flickerTime.seconds() >= 1.111)) {
                     robot.flickState = Invokation_of_a_False_Life.flickStates.START;
-                } else if ((shotsFired >= 2) && (flickerTime.seconds() >= 1.3)) {
+                } else if ((shotsFired >= 2) && (flickerTime.seconds() >= 1.7)) {
                     robot.flickState = Invokation_of_a_False_Life.flickStates.START;
                 }
                 break;

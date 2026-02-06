@@ -57,7 +57,7 @@ public class AUTN_rNX extends LinearOpMode {
 
         //||||||||||||||||||||||||||||||||||||||//
         robot.hood.setPosition(0);  //CLOSE ZONE HOOD ADJUST
-        robot.setFlywheelPower(0.7343);
+        robot.setFlywheelPower(0.71);
         revTime.reset();
         sleep(888);      //CLOSE ZONE HOOD ADJUST
         //||||||||||||||||||||||||||||||||||||||//
@@ -191,7 +191,7 @@ public class AUTN_rNX extends LinearOpMode {
             robot.setFlywheelPower(0);
         } else if (robot.flywheel.getPower() == 0){
             if (pathState == 0) {
-                robot.setFlywheelPower(0.7343);
+                robot.setFlywheelPower(0.71);
             } else {
                 robot.setFlywheelPower(0.81);
             }

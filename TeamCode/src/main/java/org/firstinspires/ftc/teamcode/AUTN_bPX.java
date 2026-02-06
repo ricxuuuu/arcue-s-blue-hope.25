@@ -69,6 +69,9 @@ public class AUTN_bPX extends LinearOpMode {
                     pathState = 1;
                     break;
                 case 1:
+                    if (robot.follower.isBusy()) {
+                        revTime.reset();
+                    }
                     if (!robot.follower.isBusy()) {
                         shootToKill(flickerTime, revTime);
                         if (shotsFired >= 4) {
