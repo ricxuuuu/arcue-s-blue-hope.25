@@ -17,10 +17,10 @@ public class AUTN_bPX extends LinearOpMode {
     //-----------------------------------------------poses
     private final Pose startPose = new Pose(56.22,8.35, Math.toRadians(90));
     private final Pose shootPose = new Pose(56,15.3,Math.toRadians(113));
-    private final Pose Mgrab = new Pose(11,60,Math.toRadians(180));
-    private final Pose Mcont = new Pose(60,60,Math.toRadians(180));
-    private final Pose Bgrab = new Pose(9,37,Math.toRadians(180));
-    private final Pose Bcont = new Pose(45,38,Math.toRadians(180));
+    private final Pose m_grab = new Pose(11,60,Math.toRadians(180));
+    private final Pose m_ctrl = new Pose(60,60,Math.toRadians(180));
+    private final Pose b_grab = new Pose(9,37,Math.toRadians(180));
+    private final Pose b_ctrl = new Pose(45,38,Math.toRadians(180));
     private final Pose leave = new Pose(24, 24, Math.toRadians(180));
 
     private PathChain scorePre ,scoreB, scoreM, runAway;
@@ -145,18 +145,18 @@ public class AUTN_bPX extends LinearOpMode {
                 .build();
 
         scoreB = robot.follower.pathBuilder()
-                .addPath(new BezierCurve(shootPose,Bcont, Bgrab))
+                .addPath(new BezierCurve(shootPose, b_ctrl, b_grab))
                 .setTangentHeadingInterpolation()
-                .addPath(new BezierCurve(Bgrab, Bcont, shootPose))
+                .addPath(new BezierCurve(b_grab, b_ctrl, shootPose))
                 .setTangentHeadingInterpolation()
                 .setReversed()
                 .build();
 
         scoreM = robot.follower.pathBuilder()
-                .addPath(new BezierCurve(shootPose, Mcont, Mgrab))
+                .addPath(new BezierCurve(shootPose, m_ctrl, m_grab))
                 .setTangentHeadingInterpolation()
-                .addPath(new BezierLine(Mgrab, shootPose))
-                .setLinearHeadingInterpolation(Mgrab.getHeading(), shootPose.getHeading())
+                .addPath(new BezierLine(m_grab, shootPose))
+                .setLinearHeadingInterpolation(m_grab.getHeading(), shootPose.getHeading())
                 .build();
 
         runAway = robot.follower.pathBuilder()
