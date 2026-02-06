@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -56,16 +54,20 @@ public class TELEOP_driver_c extends LinearOpMode {
     @Override
     public void runOpMode() {
 
+        //||||||||||||||||||||||||||||||||||||||//
+        telemetry.addData("01/", "NOTICE ///////////// >.<");
+        telemetry.addData("02/", "#3.scratch is not yet initialized.");
+        telemetry.update();
+        //||||||||||||||||||||||||||||||||||||||//
         //-----------------------------------------------PREP
         robot.init(hardwareMap);
-        robot.localizeViaApril();
 
         boolean fly = false;
         boolean in = false;
         boolean out = false;
-        boolean follower_control;
         boolean ultima_ratio = false;
         boolean is_blue_alliance = false;
+        boolean follower_control;
 
         //start up a timer for flicker use
         ElapsedTime flickerTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
@@ -90,55 +92,50 @@ public class TELEOP_driver_c extends LinearOpMode {
 
         //------------------------------------------------------------------------------------------
         while (opModeIsActive()) {
-            robot.follower.updatePose();
-            follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13;
 
+            follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13;
 
             //-----------------------------------------------DRIVETRAIN
             if (!follower_control) {
-
-                //-----------------------------------------------MANUAL CONTROL
+                //---------------------------------MANUAL CONTROL
                 double axial = -gamepad1.left_stick_y; // forward/back
                 double lateral = gamepad1.left_stick_x; // strafe
                 double yaw = gamepad1.right_stick_x; // turn
 
                 //drivetrain joystick movement
                 robot.drive(axial, lateral, yaw);
-                //-----------------------------------------------MANUAL CONTROL
-
+                //---------------------------------MANUAL CONTROL
             } else {
-
-                //-----------------------------------------------BOT HOLD ADJ GOAL
+                //---------------------------------BOT HOLD ADJ GOAL
                 if (gamepad1.left_trigger > 0.13 && gamepad1.right_trigger < 0.13) {
                     is_blue_alliance = true;
-                    robot.follower.turnTo(robot.findIdealGoalAngle(is_blue_alliance));
-
+                    robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
                 }
                 if (gamepad1.right_trigger > 0.13 && gamepad1.left_trigger < 0.13) {
                     is_blue_alliance = false;
-                    robot.follower.turnTo(robot.findIdealGoalAngle(is_blue_alliance));
+                    robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
                 }
                 robot.follower.update();
-                //-----------------------------------------------BOT HOLD ADJ GOAL
+                //---------------------------------BOT HOLD ADJ GOAL
             }
             //-----------------------------------------------DRIVETRAIN
 
 
-            //-----------------------------------------------THE LAST RESORT
+            //-----------------------------------------------PARTIAL_IDEALIZE
             if (!ultima_ratio) {
+                robot.idealizeFlightSpeed(is_blue_alliance);
+                robot.idealizeHoodState(is_blue_alliance);
                 gamepad1.stopRumble();
-                robot.findIdealFlightSpeed(is_blue_alliance);
-                robot.setIdealHoodState(is_blue_alliance);
             } else {
                 if (!gamepad1.isRumbling()) {
                     gamepad1.rumble(0.2, 0.2, 1333);
                 }
             }
-            //-----------------------------------------------THE LAST RESORT
+            //-----------------------------------------------PARTIAL_IDEALIZE
 
 
             //-----------------------------------------------INTAKE/FLY
-            //player manual control of variables
+            //set status
             if(gamepad1.shareWasPressed()) {
                 ultima_ratio = !ultima_ratio;
             }
@@ -162,11 +159,11 @@ public class TELEOP_driver_c extends LinearOpMode {
                 robot.hoodState = Invokation_of_a_False_Life.hoodStates.FAR;
             }
 
-            //control based off variables
-            if (fly && ultima_ratio) {
-                robot.setFlywheelPower(1);
-            } else if (fly) {
+            //control based on status
+            if (fly && !ultima_ratio) {
                 robot.setFlywheelPower(robot.dream_of_flight);
+            } else if (fly) {
+                robot.setFlywheelPower(1);
             } else {
                 robot.setFlywheelPower(0);
             }
@@ -181,7 +178,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             //-----------------------------------------------INTAKE/FLY
 
 
-            //-----------------------------------------------FLICK SERVO FSM
+            //-----------------------------------------------FLICKER FSM
             switch (robot.flickState) {
                 case START:
                     if (gamepad1.xWasPressed()) {
@@ -211,14 +208,15 @@ public class TELEOP_driver_c extends LinearOpMode {
                 robot.flickState = Invokation_of_a_False_Life.flickStates.START;
                 robot.flicker.setPosition(0);
             }
-            //-----------------------------------------------FLICK SERVO FSM
+            //-----------------------------------------------FLICKER FSM
 
 
             //-----------------------------------------------UPDATES
-            robot.setHoodPos(robot.hoodState, is_blue_alliance);
-            robot.adjustDecimation();
-            robot.localizeViaApril();
+            robot.idealizeDecimation();
+            robot.runAprilAstroNavigation();
             robot.pinpoint.update();
+            robot.follower.updatePose();
+            robot.updHoodPos(robot.hoodState, is_blue_alliance);
             //-----------------------------------------------UPDATES
 
 
@@ -231,7 +229,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             telemetry.addData("| FLCKR > POS/STATE, HOOD > POS", "%.1f / %s, %.1f", robot.flicker.getPosition(), robot.flickState, robot.hood.getPosition());
             telemetry.addData("| VISION > SEEN / DECIMATION / FPS", "%d / %d / %.1f", robot.aprilTPR.getDetections().size(), robot.currentDecimation, robot.visionPortal.getFps());
             telemetry.addData(">>> || I was wrong. You're not greedy... You're bat-shit insane!", "omelettes!");
-            telemetry.addData("| ALLIANCE / HYPT FROM / GOAL ∠D / RAW ∠D", "%s / %.1f / %.1f / %.1f", is_blue_alliance ? "BLUE" : "RED", robot.findHypotenuseFromGoal(is_blue_alliance), robot.findIdealGoalAngle(is_blue_alliance), robot.hallucination);
+            telemetry.addData("| ALLIANCE / HYPT FROM / GOAL ∠D / RAW ∠D", "%s / %.1f / %.1f / %.1f", is_blue_alliance ? "BLUE" : "RED", robot.findGoalDistance(is_blue_alliance), robot.findGoalHeading(is_blue_alliance), robot.hallucination);
             telemetry.update();
             //-----------------------------------------------TELEMETRY
         }

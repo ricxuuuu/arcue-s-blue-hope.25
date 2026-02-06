@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import static java.lang.Thread.sleep;
+import android.util.Size;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ftc.InvertedFTCCoordinates;
@@ -13,8 +13,6 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -28,7 +26,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 
 //--------------------------------------------------imports and packages
 
@@ -59,10 +56,10 @@ public class Invokation_of_a_False_Life {
     private static final String PINPOINT = "pinpoint";
 
     //create Enum for flicker servo, and assign position
-    public enum flickStates {START,UPWARDS,DOWNWARDS}
+    public enum flickStates {START,UPWARDS,DOWNWARDS,MOONLIGHT}
     flickStates flickState = flickStates.START;
 
-    public enum hoodStates {NEAR, MID, FAR, CHICKEN_RASPBERRY, HORIZON_ROSEMARY}
+    public enum hoodStates {NEAR,MID,FAR,CHICKEN_RASPBERRY,HORIZON_ROSEMARY}
     hoodStates hoodState = hoodStates.NEAR;
 
     public double dream_of_flight = 1;
@@ -71,7 +68,7 @@ public class Invokation_of_a_False_Life {
     Pose f_startingPose = PoseConverter.pose2DToPose(startingPose, InvertedFTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
     //im not sure if needed but will be overwritten pretty much immediately anyway
 
-    private final Position cameraPosition = new Position(DistanceUnit.MM, 133.550, 83.102, 256.042, 0);
+    private final Position cameraPosition = new Position(DistanceUnit.MM, 132.633, 92.440, 266, 0);
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, 72.029, 0, 0);
 
     //---------------------- class creation ↑ --- methods ↓ -------
@@ -118,21 +115,19 @@ public class Invokation_of_a_False_Life {
         aprilTPR = new AprilTagProcessor.Builder()
                 .setCameraPose(cameraPosition, cameraOrientation)
                 //.setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
-                //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
                 .setOutputUnits(DistanceUnit.MM, AngleUnit.DEGREES)
                 .build();
-        aprilTPR.setDecimation(2);
+        aprilTPR.setDecimation(1);
         VisionPortal.Builder VPbuilder = new VisionPortal.Builder()
                 .setCamera(hwMap.get(WebcamName.class, "webcam"))
-                //.setCameraResolution(new Size(640, 360))
+                .setCameraResolution(new Size(864, 480))
                 .enableLiveView(false)
-
                 .addProcessor(aprilTPR);
         visionPortal = VPbuilder.build();
     }
 
     private void configurePinpoint() {
-        pinpoint.setOffsets(-119.227, 33.854, DistanceUnit.MM);
+        pinpoint.setOffsets(-118.033, 39.999, DistanceUnit.MM);
 
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
@@ -143,7 +138,7 @@ public class Invokation_of_a_False_Life {
         pinpoint.resetPosAndIMU();
     }
 
-    //action methods
+    //action and update methods
     public void drive(double axial, double lateral, double yaw) {
 
         // imperfect strafe compensation
@@ -172,29 +167,35 @@ public class Invokation_of_a_False_Life {
         flywheel2.setPower(power);
     }
 
-    public void setHoodPos(hoodStates hoodState, boolean is_blue_alliance) {
-        if (hoodState == hoodStates.NEAR) {
-            hood.setPosition(0);
-        }
-        if (hoodState == hoodStates.MID) {
-            hood.setPosition(0.4);
-        }
-        if (hoodState == hoodStates.FAR) {
-            hood.setPosition(1);
-        }
+    public void updHoodPos(hoodStates hoodState, boolean is_blue_alliance) {
         if (hoodState == hoodStates.CHICKEN_RASPBERRY) {
             hood.setPosition(
-                    (0.01647 * findHypotenuseFromGoal(is_blue_alliance))
-                    - 0.57
+                    (0.01647 * findGoalDistance(is_blue_alliance))
+                            - 0.57
             );
+            return;
         }
         if (hoodState == hoodStates.HORIZON_ROSEMARY) {
             hood.setPosition(1);
+            return;
         }
+        if (hoodState == hoodStates.NEAR) {
+            hood.setPosition(0);
+            return;
+        }
+        if (hoodState == hoodStates.MID) {
+            hood.setPosition(0.4);
+            return;
+        }
+        if (hoodState == hoodStates.FAR) {
+            hood.setPosition(1);
+            return;
+        }
+
     }
 
-    public void setIdealHoodState(boolean is_blue_alliance) {
-        double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
+    public void idealizeHoodState(boolean is_blue_alliance) {
+        double hypotenuse = findGoalDistance(is_blue_alliance);
 
         if (hypotenuse <= 64) {
             hoodState = hoodStates.CHICKEN_RASPBERRY;
@@ -205,8 +206,8 @@ public class Invokation_of_a_False_Life {
         }
     }
 
-    public void findIdealFlightSpeed(boolean is_blue_alliance) {
-        double hypotenuse = findHypotenuseFromGoal(is_blue_alliance);
+    public void idealizeFlightSpeed(boolean is_blue_alliance) {
+        double hypotenuse = findGoalDistance(is_blue_alliance);
 
         if (hypotenuse <= 68) {
             dream_of_flight = 0.73;
@@ -217,27 +218,26 @@ public class Invokation_of_a_False_Life {
         }
     }
 
-    public void adjustDecimation() {
-        if (pinpoint.getPosX(DistanceUnit.INCH) > 24) {
+    public void idealizeDecimation() {
+        if ((pinpoint.getPosX(DistanceUnit.INCH) > 24) && (currentDecimation != 1)) {
             aprilTPR.setDecimation(1);
             currentDecimation = 1;
-        } else {
+        } else if (currentDecimation !=3) {
             aprilTPR.setDecimation(3);
             currentDecimation = 3;
         }
     }
 
 
-    //information acquisition and output methods
+    //information acquisition, output, and processing methods
     public double getFlywheelRPM() {
         double ticksPer = 28; //adj for REV ultraplanetary ticks
         double velocity = flywheel.getVelocity(); //ticks per second
         return (velocity / ticksPer) * 60.0; //return rotations per minute
     }
 
-    public double findHypotenuseFromGoal (boolean is_blue_alliance) {
+    public double findGoalDistance (boolean is_blue_alliance) {
         double hypotenuse = 0;
-        pinpoint.update();
 
         if (is_blue_alliance) {
             hypotenuse = Math.hypot(Math.abs(-72 -pinpoint.getPosX(DistanceUnit.INCH)), Math.abs(-72 - pinpoint.getPosY(DistanceUnit.INCH)));
@@ -248,11 +248,9 @@ public class Invokation_of_a_False_Life {
         return hypotenuse;
     }
 
-    public double findIdealGoalAngle(boolean is_blue_alliance) {
+    public double findGoalHeading(boolean is_blue_alliance) {
         double angle = 0;
-        pinpoint.update();
 
-        //find angle to point @goal
         if (is_blue_alliance) {
             angle = Math.atan2(-69 - pinpoint.getPosY(DistanceUnit.INCH), -69 - pinpoint.getPosX(DistanceUnit.INCH));
         } else {
@@ -262,7 +260,7 @@ public class Invokation_of_a_False_Life {
         return angle;
     }
 
-    public void localizeViaApril() {
+    public void runAprilAstroNavigation() {
         List<AprilTagDetection> currentDetections = aprilTPR.getDetections();
         for (AprilTagDetection detection : currentDetections) {
             if (detection.id == 24) {
@@ -273,7 +271,7 @@ public class Invokation_of_a_False_Life {
                             detection.robotPose.getPosition().x,
                             detection.robotPose.getPosition().y,
                             AngleUnit.DEGREES,
-                            translateTCHeading(true, hallucination)));
+                            star_AntiDelusion(true, hallucination)));
                 }
             }
             if (detection.id == 20) {
@@ -284,32 +282,13 @@ public class Invokation_of_a_False_Life {
                             detection.robotPose.getPosition().x,
                             detection.robotPose.getPosition().y,
                             AngleUnit.DEGREES,
-                            translateTCHeading(false, hallucination)));
+                            star_AntiDelusion(false, hallucination)));
                 }
             }
         }
     }
 
-    public double findTargetBearing(boolean is_red) {
-        List<AprilTagDetection> currentDetections = aprilTPR.getDetections();
-        for (AprilTagDetection detection : currentDetections) {
-            if (is_red && detection.id == 24) {
-                hallucination = detection.ftcPose.bearing;
-                hallucination -= 3;
-            }
-            if (!is_red && detection.id == 20) {
-                hallucination = detection.ftcPose.bearing;
-                hallucination += 3;
-            }
-        }
-        if (hallucination < 45 && hallucination > -45) {
-            return Math.toRadians(hallucination);
-        } else {
-            return 0;
-        }
-    }
-
-    private double translateTCHeading(boolean red, double angle_given) {
+    private double star_AntiDelusion(boolean red, double angle_given) {
         if (red) {
             angle_given += 90;
         } else {
@@ -323,6 +302,27 @@ public class Invokation_of_a_False_Life {
         } //normalize
 
         return angle_given; //heading 0 facing audience / north if X is vert.
+    }
+
+    public double findAprilStarBearing(boolean red) {
+        List<AprilTagDetection> currentDetections = aprilTPR.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if (red && detection.id == 24) {
+                hallucination = detection.ftcPose.bearing;
+                hallucination -= 3;
+                break;
+            }
+            if (!red && detection.id == 20) {
+                hallucination = detection.ftcPose.bearing;
+                hallucination += 3;
+                break;
+            }
+        }
+        if (hallucination < 66 && hallucination > -66) {
+            return Math.toRadians(hallucination);
+        } else {
+            return 0;
+        }
     }
 
 }
