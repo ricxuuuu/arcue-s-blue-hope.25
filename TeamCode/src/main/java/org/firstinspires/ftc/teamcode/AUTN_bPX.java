@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -16,10 +17,10 @@ public class AUTN_bPX extends LinearOpMode {
     //-----------------------------------------------poses
     private final Pose startPose = new Pose(56.22,8.35, Math.toRadians(90));
     private final Pose shootPose = new Pose(56,15.3,Math.toRadians(113));
-    private final Pose approachMPose = new Pose(48,53,Math.toRadians(180));
-    private final Pose pickupMPose = new Pose(11,51,Math.toRadians(180));
-    private final Pose approachBPose = new Pose(48,36,Math.toRadians(180));
-    private final Pose pickupBPose = new Pose(11,36,Math.toRadians(180));
+    private final Pose Mgrab = new Pose(11,60,Math.toRadians(180));
+    private final Pose Mcont = new Pose(60,60,Math.toRadians(180));
+    private final Pose Bgrab = new Pose(9,37,Math.toRadians(180));
+    private final Pose Bcont = new Pose(45,38,Math.toRadians(180));
     private final Pose leave = new Pose(24, 24, Math.toRadians(180));
 
     private PathChain scorePre ,scoreB, scoreM, runAway;
@@ -144,21 +145,18 @@ public class AUTN_bPX extends LinearOpMode {
                 .build();
 
         scoreB = robot.follower.pathBuilder()
-                .addPath(new BezierLine(shootPose, approachBPose))
-                .setLinearHeadingInterpolation(shootPose.getHeading(), approachBPose.getHeading())
-                .addPath(new BezierLine(approachBPose, pickupBPose))
+                .addPath(new BezierCurve(shootPose,Bcont, Bgrab))
                 .setTangentHeadingInterpolation()
-                .addPath(new BezierLine(pickupBPose, shootPose))
-                .setLinearHeadingInterpolation(pickupBPose.getHeading(), shootPose.getHeading())
+                .addPath(new BezierCurve(Bgrab, Bcont, shootPose))
+                .setTangentHeadingInterpolation()
+                .setReversed()
                 .build();
 
         scoreM = robot.follower.pathBuilder()
-                .addPath(new BezierLine(shootPose, approachMPose))
-                .setLinearHeadingInterpolation(shootPose.getHeading(), approachMPose.getHeading())
-                .addPath(new BezierLine(approachMPose, pickupMPose))
+                .addPath(new BezierCurve(shootPose, Mcont, Mgrab))
                 .setTangentHeadingInterpolation()
-                .addPath(new BezierLine(pickupMPose, shootPose))
-                .setLinearHeadingInterpolation(pickupMPose.getHeading(), shootPose.getHeading())
+                .addPath(new BezierLine(Mgrab, shootPose))
+                .setLinearHeadingInterpolation(Mgrab.getHeading(), shootPose.getHeading())
                 .build();
 
         runAway = robot.follower.pathBuilder()
