@@ -7,18 +7,18 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name = "AUTON//red pos(x) 9999  ⸙", group = "Linear Op-mode")
-public class AUTN_ns9999 extends LinearOpMode {
+@Autonomous(name = "AUTON//blue pos(x) 9999  ⸙", group = "Linear Op-mode")
+public class AUTN_b_ns9999 extends LinearOpMode {
 
     private final Invokation_of_a_False_Life robot = new Invokation_of_a_False_Life();
     //|||||||||||||||||||||||||||||||// ✧ >.<  //summon a false life to do our bidding
 
     //-----------------------------------------------poses
-    private final Pose startPose = new Pose(87.78,8.35, Math.toRadians(90));
-    private final Pose shootPose = new Pose(86.6,15.7,Math.toRadians(67));
-    private final Pose approachBPose = new Pose(96,34.7,Math.toRadians(0));
-    private final Pose pickupBPose = new Pose(131,34.7,Math.toRadians(0));
-    private final Pose leave = new Pose(120, 24, Math.toRadians(0));
+    private final Pose startPose = new Pose(56.22,8.35, Math.toRadians(90));
+    private final Pose shootPose = new Pose(57.4,15.7,Math.toRadians(113));
+    private final Pose approachBPose = new Pose(48,34.7,Math.toRadians(180));
+    private final Pose pickupBPose = new Pose(13,34.7,Math.toRadians(180));
+    private final Pose leave = new Pose(24, 24, Math.toRadians(180));
 
     private PathChain scorePre ,scoreB, runAway;
     int pathState = 0;
@@ -32,7 +32,7 @@ public class AUTN_ns9999 extends LinearOpMode {
         //||||||||||||||||||||||||||||||||||||||//
         telemetry.addData("01/", "NOTICE ///////////// >.<");
         telemetry.addData("02/", "#3.scratch is not yet initialized.");
-        telemetry.addData("03/", "Selected Performance - 🔴Red Audience");
+        telemetry.addData("03/", "Selected Performance - 🔵Blue Audience");
         telemetry.update();
         //||||||||||||||||||||||||||||||||||||||//
         //-----------------------------------------------PREP
@@ -45,7 +45,7 @@ public class AUTN_ns9999 extends LinearOpMode {
 
         //-----------------------------------------------PREP
         //||||||||||||||||||||||||||||||||||||||//
-        telemetry.addData("🔴A//... ", "let the hunt begin ~ ⚔!");
+        telemetry.addData("🔵A//... ", "let the hunt begin ~ ⚔!");
         telemetry.update();
         //||||||||||||||||||||||||||||||||||||||//
 
