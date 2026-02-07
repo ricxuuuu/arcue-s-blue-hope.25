@@ -186,7 +186,6 @@ public class Invokation_of_a_False_Life {
         }
         if (hoodState == hoodStates.FAR) {
             hood.setPosition(1);
-            return;
         }
 
     }
@@ -234,7 +233,7 @@ public class Invokation_of_a_False_Life {
     }
 
     public double findGoalDistance (boolean is_blue_alliance) {
-        double hypotenuse = 0;
+        double hypotenuse;
 
         if (is_blue_alliance) {
             hypotenuse = Math.hypot(Math.abs(-72 -pinpoint.getPosX(DistanceUnit.INCH)), Math.abs(-72 - pinpoint.getPosY(DistanceUnit.INCH)));
@@ -246,7 +245,7 @@ public class Invokation_of_a_False_Life {
     }
 
     public double findGoalHeading(boolean is_blue_alliance) {
-        double angle = 0;
+        double angle;
 
         if (is_blue_alliance) {
             angle = Math.atan2(-69 - pinpoint.getPosY(DistanceUnit.INCH), -69 - pinpoint.getPosX(DistanceUnit.INCH));
