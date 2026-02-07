@@ -1,6 +1,7 @@
 ## NOTICE
 
-This repository contains the public FTC SDK for the DECODE (2025-2026) competition season, and my code and stuffs. 
+This repository contains the public FTC SDK for the DECODE (2025-2026) competition season, as my code and stuffs. 
+I realise theres no indication anywhere else, so this is the code FTC team #19532 as of 2026 is using for our #3 'scratch'.
 
 ----------------------------------------------
 ⠀⠀⠀⠀⠀⠀⠀⢠⡔⠒⢦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -19,3 +20,5 @@ i think things should be pretty
 
 https://www.youtube.com/watch?v=cvaIgq5j2Q8
 eternity
+
+-ricxu
