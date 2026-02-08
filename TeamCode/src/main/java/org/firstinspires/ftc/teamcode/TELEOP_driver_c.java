@@ -181,19 +181,19 @@ public class TELEOP_driver_c extends LinearOpMode {
                 case START:
                     if (gamepad1.xWasPressed()) {
                         flickerTime.reset();
-                        robot.flicker.setPosition(0.73); //go up
+                        robot.flicker.setPosition(0.81); //go up
                         robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
                     }
                     break;
                 case UPWARDS:
-                    if (flickerTime.seconds() >= 0.177) {
+                    if (flickerTime.seconds() >= 0.063) {
                         flickerTime.reset();
                         robot.flicker.setPosition(0); //go down
                         robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
                     }
                     break;
                 case DOWNWARDS:
-                    if (flickerTime.seconds() >= 0.133) {
+                    if (flickerTime.seconds() >= 0.044) {
                         robot.flickState = Invokation_of_a_False_Life.flickStates.START;
                     }
                     break;

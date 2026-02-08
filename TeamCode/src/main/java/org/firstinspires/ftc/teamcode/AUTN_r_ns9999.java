@@ -54,7 +54,7 @@ public class AUTN_r_ns9999 extends LinearOpMode {
         //||||||||||||||||||||||||||||||||||||||//
         robot.hood.setPosition(1);  //FAR ZONE HOOD ADJUST
         //robot.setFlywheelPower(1);
-        sleep(1000);      //FAR ZONE HOOD ADJUST
+        sleep(888);      //FAR ZONE HOOD ADJUST
         //||||||||||||||||||||||||||||||||||||||//
 
         //----------------------------------------------------------------------------------------
@@ -95,7 +95,6 @@ public class AUTN_r_ns9999 extends LinearOpMode {
                     break;
                 default:
                     robot.intake.setPower(0);
-                    robot.setFlywheelPower(0);
                     break;
 
             }

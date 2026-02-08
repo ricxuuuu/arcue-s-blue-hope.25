@@ -84,7 +84,7 @@ public class AUTN_rPX extends LinearOpMode {
                 case 2:
                     if (!robot.follower.isBusy()) {
                         shootToKill(flickerTime, revTime);
-                        if (shotsFired >= 4) {
+                        if (shotsFired >= 3) {
                             robot.follower.followPath(scoreM, true);
                             pathState = 3;
                             reload();
@@ -228,11 +228,11 @@ public class AUTN_rPX extends LinearOpMode {
     private void shootToKill(ElapsedTime flickerTime, ElapsedTime revTime) {
         switch (robot.flickState) {
             case START:
-                if (shotsFired < 4 && shotsFired != 0 && (revTime.seconds() > 1.7)) {
+                if (shotsFired < 4 && shotsFired != 0 && (revTime.seconds() > 1)) {
                     flickerTime.reset();
                     robot.flicker.setPosition(0.73); //go up
                     robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
-                } else if (shotsFired <= 0 && (revTime.seconds() > 2.3)) {
+                } else if (shotsFired <= 0 && (revTime.seconds() > 1.7)) {
                     flickerTime.reset();
                     robot.flicker.setPosition(0.73); //go up
                     robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
@@ -253,7 +253,7 @@ public class AUTN_rPX extends LinearOpMode {
                 }
                 break;
             case MOONLIGHT:
-                if ((shotsFired < 2) && (flickerTime.seconds() >= 0.888)) {
+                if ((shotsFired < 2) && (flickerTime.seconds() >= 0.555)) {
                     robot.flickState = Invokation_of_a_False_Life.flickStates.START;
                 } else if ((shotsFired >= 2) && (flickerTime.seconds() >= 1.3)) {
                     robot.flickState = Invokation_of_a_False_Life.flickStates.START;

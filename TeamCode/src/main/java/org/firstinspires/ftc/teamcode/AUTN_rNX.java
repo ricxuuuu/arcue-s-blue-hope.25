@@ -78,7 +78,7 @@ public class AUTN_rNX extends LinearOpMode {
                 case 1:
                     if (!robot.follower.isBusy()) {
                         shootToKill(flickerTime, revTime);
-                        if (shotsFired >= 4) {
+                        if (shotsFired >= 3) {
                             robot.follower.followPath(scoreM, true);
                             pathState = 2;
                             reload();

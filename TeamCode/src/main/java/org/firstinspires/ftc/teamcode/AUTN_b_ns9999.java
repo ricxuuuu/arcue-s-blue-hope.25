@@ -59,7 +59,6 @@ public class AUTN_b_ns9999 extends LinearOpMode {
 
         //----------------------------------------------------------------------------------------
         while (opModeIsActive()) {
-
             switch (pathState) {
                 case 0:
                     robot.follower.followPath(scorePre, true);
@@ -95,7 +94,6 @@ public class AUTN_b_ns9999 extends LinearOpMode {
                     break;
                 default:
                     robot.intake.setPower(0);
-                    robot.setFlywheelPower(0);
                     break;
 
             }
@@ -109,7 +107,7 @@ public class AUTN_b_ns9999 extends LinearOpMode {
 
 
             //-----------------------------------------------TELEMETRY
-            telemetry.addData("---------------------//STATUS-RED", "hunting...");
+            telemetry.addData("---------------------//STATUS-BLUE", "hunting...");
             //telemetry.addData("INTUITION", intuition);
             telemetry.addData("FIRED", shotsFired);
             telemetry.addData("F_STATE/POS", "%s / %.2f", robot.flickState, robot.flicker.getPosition());
