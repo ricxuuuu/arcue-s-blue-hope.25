@@ -71,6 +71,12 @@ public class TELEOP_driver_c extends LinearOpMode {
         ElapsedTime flickerTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
         //-----------------------------------------------PREP
         //||||||||||||||||||||||||||||||||||||||//
+        telemetry.addData("01/", "#Configuring Camera...");
+        telemetry.update();
+        //||||||||||||||||||||||||||||||||||||||//
+        robot.traumatizeCamera(33, 43);
+        //-----------------------------------------------PREP
+        //||||||||||||||||||||||||||||||||||||||//
         telemetry.addData("01/", "ごめん あまない 俺は今お前のために怒ってない");
         telemetry.addData("02/", "誰も憎んじゃいない");
         telemetry.addData("03/", "今はただただ この世界が心地いい");

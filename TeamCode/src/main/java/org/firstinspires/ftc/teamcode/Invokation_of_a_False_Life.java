@@ -5,12 +5,15 @@ import com.pedropathing.ftc.InvertedFTCCoordinates;
 import com.pedropathing.ftc.PoseConverter;
 import com.pedropathing.geometry.PedroCoordinates;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -23,6 +26,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 //--------------------------------------------------imports and packages
 
@@ -67,6 +71,10 @@ public class Invokation_of_a_False_Life {
 
     private final Position cameraPosition = new Position(DistanceUnit.MM, 132.633, 92.440, 266, 0);
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, 72.029, 0, 0);
+
+    ExposureControl exposure_to_death;
+    GainControl my_self_benefit;
+    boolean cameraTraumatized = false;
 
     //---------------------- class creation ↑ --- methods ↓ -------
 
@@ -120,7 +128,6 @@ public class Invokation_of_a_False_Life {
                 .enableLiveView(false)
                 .addProcessor(aprilTPR);
         visionPortal = VPbuilder.build();
-
     }
 
     private void configurePinpoint() {
@@ -134,6 +141,25 @@ public class Invokation_of_a_False_Life {
 
         pinpoint.resetPosAndIMU();
     }
+
+    public void traumatizeCamera(int exposure, int greed) {
+        while (!cameraTraumatized) {
+            if (visionPortal == null || visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {break;}
+
+            exposure_to_death = visionPortal.getCameraControl(ExposureControl.class);
+            my_self_benefit = visionPortal.getCameraControl(GainControl.class);
+
+            if (exposure_to_death.getMode() != ExposureControl.Mode.Manual) {
+                exposure_to_death.setMode(ExposureControl.Mode.Manual);
+            }
+
+            exposure_to_death.setExposure(exposure, TimeUnit.MILLISECONDS);
+            my_self_benefit.setGain(greed);
+
+            cameraTraumatized = exposure_to_death.getExposure(TimeUnit.MILLISECONDS) == exposure && my_self_benefit.getGain() == greed;
+        }
+    }
+
 
     //action and update methods
     public void drive(double axial, double lateral, double yaw) {
