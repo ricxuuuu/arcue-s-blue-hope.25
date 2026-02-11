@@ -88,7 +88,7 @@ public class Invokation_of_a_False_Life {
     //---------------------- class creation ↑ --- methods ↓ -------
 
     //initialization methods
-    public void init(HardwareMap hwMap){
+    public void init(HardwareMap hwMap, boolean self_will){
         //bulk reading
         List<LynxModule> entirety = hwMap.getAll(LynxModule.class);
         for (LynxModule hub : entirety) {
@@ -127,7 +127,11 @@ public class Invokation_of_a_False_Life {
         pinpoint.setPosition(startingPose);
 
         //pedropath init
-        follower = Constants.createFollower(hwMap);
+        if (self_will) {
+            follower = Constants.createFollowerAuton(hwMap);
+        } else {
+            follower = Constants.createFollowerTeleOp(hwMap);
+        }
         follower.setStartingPose(f_startingPose);
         follower.updatePose();
 
@@ -221,6 +225,11 @@ public class Invokation_of_a_False_Life {
         flywheel2.setPower(power);
     }
 
+    public void setFlywheelSpeed(double rpm) {
+        flywheel.setVelocity(28 * rpm / 60);
+        flywheel2.setVelocity(28 * rpm / 60);
+    }
+
     public void rechain_motion() {
         flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, wishful_thinking);
         flywheel2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, wishful_thinking);
@@ -268,11 +277,14 @@ public class Invokation_of_a_False_Life {
         double hypotenuse = findGoalDistance(is_blue_alliance);
 
         if (hypotenuse <= 68) {
-            dream_of_flight = 0.73;
-        } else if (hypotenuse > 68 && hypotenuse <= 75) {
-            dream_of_flight = 0.81;
-        } else if (hypotenuse > 75 && hypotenuse <= 119){
-            dream_of_flight = 0.86;
+            //dream_of_flight = 0.73;
+            dream_of_flight = 3600;
+        } else if (hypotenuse > 68 && hypotenuse <= 80) {
+            //dream_of_flight = 0.81;
+            dream_of_flight = 4100;
+        } else if (hypotenuse > 80 && hypotenuse <= 119){
+            //dream_of_flight = 0.86;
+            dream_of_flight = 4400;
         } else {
             dream_of_flight = 1;
         }
@@ -282,7 +294,7 @@ public class Invokation_of_a_False_Life {
         if ((pinpoint.getPosX(DistanceUnit.INCH) > 24) && (currentDecimation != 1)) {
             aprilTPR.setDecimation(1);
             currentDecimation = 1;
-        } else if (currentDecimation !=2) {
+        } else if (currentDecimation !=2 && (pinpoint.getPosX(DistanceUnit.INCH) < 24)) {
             aprilTPR.setDecimation(2);
             currentDecimation = 2;
         }
@@ -365,6 +377,7 @@ public class Invokation_of_a_False_Life {
     }
 
     public double findAprilStarBearing(boolean red) { //currently unused
+        hallucination = 0;
         List<AprilTagDetection> currentDetections = aprilTPR.getDetections();
         for (AprilTagDetection detection : currentDetections) {
             if (red && detection.id == 24) {
@@ -382,6 +395,7 @@ public class Invokation_of_a_False_Life {
         } else {
             return 0;
         }
+
     }
 
 }

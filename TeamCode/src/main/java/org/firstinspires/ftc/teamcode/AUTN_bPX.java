@@ -39,7 +39,7 @@ public class AUTN_bPX extends LinearOpMode {
         //||||||||||||||||||||||||||||||||||||||//
         //-----------------------------------------------PREP
 
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, true);
         robot.follower.setPose(startPose);
         buildPaths();
         ElapsedTime flickerTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);

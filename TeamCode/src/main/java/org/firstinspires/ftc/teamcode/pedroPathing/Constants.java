@@ -13,7 +13,14 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Constants {
-    public static FollowerConstants followerConstants = new FollowerConstants()
+    public static FollowerConstants followerConstantsTeleOp = new FollowerConstants()
+            .mass(13)
+            .forwardZeroPowerAcceleration(-31.66)
+            .lateralZeroPowerAcceleration(-73.14)
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.05, 0.00002, 0.00002, 0.033))
+            .headingPIDFCoefficients(new PIDFCoefficients(1.3, 0, 0.05, 0.01));
+
+    public static FollowerConstants followerConstantsAuton = new FollowerConstants()
             .mass(13)
             .forwardZeroPowerAcceleration(-31.66)
             .lateralZeroPowerAcceleration(-73.14)
@@ -44,13 +51,21 @@ public class Constants {
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
-    public static Follower createFollower(HardwareMap hardwareMap) {
-        return new FollowerBuilder(followerConstants, hardwareMap)
+    public static Follower createFollowerTeleOp(HardwareMap hardwareMap) {
+        return new FollowerBuilder(followerConstantsTeleOp, hardwareMap)
                 .pathConstraints(pathConstraints)
                 .mecanumDrivetrain(driveConstants)
                 .pinpointLocalizer(localizerConstants)
                 .build();
 
+    }
+
+    public static Follower createFollowerAuton(HardwareMap hardwareMap) {
+        return new FollowerBuilder(followerConstantsAuton,hardwareMap)
+                .pathConstraints(pathConstraints)
+                .mecanumDrivetrain(driveConstants)
+                .pinpointLocalizer(localizerConstants)
+                .build();
     }
 
 

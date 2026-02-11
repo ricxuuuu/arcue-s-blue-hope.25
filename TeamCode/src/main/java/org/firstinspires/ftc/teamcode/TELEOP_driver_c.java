@@ -58,13 +58,15 @@ public class TELEOP_driver_c extends LinearOpMode {
         telemetry.update();
         //||||||||||||||||||||||||||||||||||||||//
         //-----------------------------------------------PREP
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, false);
 
         boolean fly = false;
         boolean in = false;
         boolean out = false;
         boolean ultima_ratio = false;
         boolean is_blue_alliance = false;
+        boolean turningB = false;
+        boolean turningR = false;
         boolean follower_control;
 
         //start up a timer for flicker use
@@ -99,7 +101,17 @@ public class TELEOP_driver_c extends LinearOpMode {
         //------------------------------------------------------------------------------------------
         while (opModeIsActive()) {
 
-            follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13 ^ gamepad1.leftBumperWasPressed() ^ gamepad1.rightBumperWasPressed();
+            if (gamepad1.leftBumperWasPressed()) {
+                turningB = true;
+            } else if (gamepad1.rightBumperWasPressed()) {
+                turningR = true;
+            }
+            if (gamepad1.leftBumperWasReleased()) {
+                turningB = false;
+            } else if (gamepad1.rightBumperWasReleased()) {
+                turningR = false;
+            }
+            follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13 ^ turningB ^ turningR;
 
             //-----------------------------------------------DRIVETRAIN
             if (!follower_control) {
@@ -121,12 +133,12 @@ public class TELEOP_driver_c extends LinearOpMode {
                     is_blue_alliance = false;
                     robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
                 }
-                if (!(gamepad1.right_trigger > 0.13 || gamepad1.left_trigger > 0.13)) {
-                    if (gamepad1.leftBumperWasPressed()) {
-                        robot.follower.turn(robot.findAprilStarBearing(false), true);
-                    } else if (gamepad1.rightBumperWasPressed()) {
-                        robot.follower.turn(robot.findAprilStarBearing(true), true);
-                    }
+                if (turningB) {
+                    is_blue_alliance = true;
+                    robot.follower.turn(robot.findAprilStarBearing(false), true);
+                } else if (turningR) {
+                    is_blue_alliance = false;
+                    robot.follower.turn(robot.findAprilStarBearing(true), true);
                 }
                 robot.follower.update();
                 //---------------------------------BOT HOLD ADJ GOAL
@@ -174,7 +186,11 @@ public class TELEOP_driver_c extends LinearOpMode {
 
             //control based on status
             if (fly && !ultima_ratio) {
-                robot.setFlywheelPower(robot.dream_of_flight);
+                if (robot.dream_of_flight == 1) {
+                    robot.setFlywheelPower(1);
+                } else {
+                    robot.setFlywheelSpeed(robot.dream_of_flight);
+                }
             } else if (fly) {
                 robot.setFlywheelPower(1);
             } else {

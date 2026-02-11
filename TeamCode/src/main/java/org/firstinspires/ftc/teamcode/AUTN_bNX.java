@@ -41,7 +41,7 @@ public class AUTN_bNX extends LinearOpMode {
         //||||||||||||||||||||||||||||||||||||||//
         //-----------------------------------------------PREP
 
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, true);
         robot.follower.setPose(startPose);
         buildPaths();
         ElapsedTime flickerTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
