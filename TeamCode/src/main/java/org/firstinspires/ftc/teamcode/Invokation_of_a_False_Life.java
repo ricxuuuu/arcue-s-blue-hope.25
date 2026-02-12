@@ -6,14 +6,19 @@ import com.pedropathing.ftc.PoseConverter;
 import com.pedropathing.geometry.PedroCoordinates;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.ams.AMSColorSensor;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.FocusControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.WhiteBalanceControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -74,12 +79,22 @@ public class Invokation_of_a_False_Life {
 
     ExposureControl exposure_to_death;
     GainControl my_self_benefit;
+    WhiteBalanceControl philosophy;
+    FocusControl persistence;
     boolean cameraTraumatized = false;
+
+    PIDFCoefficients wishful_thinking = new PIDFCoefficients(173, 0, 0, 12.4);
 
     //---------------------- class creation ↑ --- methods ↓ -------
 
     //initialization methods
     public void init(HardwareMap hwMap){
+        //bulk reading
+        List<LynxModule> entirety = hwMap.getAll(LynxModule.class);
+        for (LynxModule hub : entirety) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
+
         //actuator hardware-map
         frontLeft = hwMap.get(DcMotor.class, FRONT_LEFT);
         frontRight = hwMap.get(DcMotor.class, FRONT_RIGHT);
@@ -138,7 +153,6 @@ public class Invokation_of_a_False_Life {
         pinpoint.setEncoderDirections
                 (GoBildaPinpointDriver.EncoderDirection.REVERSED,
                         GoBildaPinpointDriver.EncoderDirection.REVERSED);
-
         pinpoint.resetPosAndIMU();
     }
 
@@ -148,15 +162,32 @@ public class Invokation_of_a_False_Life {
 
             exposure_to_death = visionPortal.getCameraControl(ExposureControl.class);
             my_self_benefit = visionPortal.getCameraControl(GainControl.class);
+            philosophy = visionPortal.getCameraControl(WhiteBalanceControl.class);
+            persistence = visionPortal.getCameraControl(FocusControl.class);
 
             if (exposure_to_death.getMode() != ExposureControl.Mode.Manual) {
                 exposure_to_death.setMode(ExposureControl.Mode.Manual);
             }
+            if (philosophy.getMode() != WhiteBalanceControl.Mode.MANUAL) {
+                philosophy.setMode(WhiteBalanceControl.Mode.MANUAL);
+            }
+            if (persistence.getMode() != FocusControl.Mode.Fixed) {
+                persistence.setMode(FocusControl.Mode.Fixed);
+            }
 
             exposure_to_death.setExposure(exposure, TimeUnit.MILLISECONDS);
             my_self_benefit.setGain(greed);
+            philosophy.setWhiteBalanceTemperature(5003);
+            persistence.setFocusLength(0);
 
-            cameraTraumatized = exposure_to_death.getExposure(TimeUnit.MILLISECONDS) == exposure && my_self_benefit.getGain() == greed;
+            cameraTraumatized =
+                    exposure_to_death.getExposure(TimeUnit.MILLISECONDS) == exposure
+                            &&
+                            my_self_benefit.getGain() == greed
+                                    &&
+                                    philosophy.getWhiteBalanceTemperature() == 5003
+                                            &&
+                                            persistence.getFocusLength() == 0;
         }
     }
 
@@ -188,6 +219,11 @@ public class Invokation_of_a_False_Life {
     public void setFlywheelPower(double power) {
         flywheel.setPower(power);
         flywheel2.setPower(power);
+    }
+
+    public void rechain_motion() {
+        flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, wishful_thinking);
+        flywheel2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, wishful_thinking);
     }
 
     public void updHoodPos(hoodStates hoodState, boolean is_blue_alliance) {
@@ -246,9 +282,9 @@ public class Invokation_of_a_False_Life {
         if ((pinpoint.getPosX(DistanceUnit.INCH) > 24) && (currentDecimation != 1)) {
             aprilTPR.setDecimation(1);
             currentDecimation = 1;
-        } else if (currentDecimation !=3) {
-            aprilTPR.setDecimation(3);
-            currentDecimation = 3;
+        } else if (currentDecimation !=2) {
+            aprilTPR.setDecimation(2);
+            currentDecimation = 2;
         }
     }
 

@@ -74,7 +74,7 @@ public class TELEOP_driver_c extends LinearOpMode {
         telemetry.addData("01/", "#Configuring Camera...");
         telemetry.update();
         //||||||||||||||||||||||||||||||||||||||//
-        robot.traumatizeCamera(33, 43);
+        robot.traumatizeCamera(7, 213);
         //-----------------------------------------------PREP
         //||||||||||||||||||||||||||||||||||||||//
         telemetry.addData("01/", "ごめん あまない 俺は今お前のために怒ってない");
@@ -94,10 +94,12 @@ public class TELEOP_driver_c extends LinearOpMode {
         waitForStart();
         //||||||||||||||||||||||||||||||||||||||//
 
+        robot.rechain_motion();
+
         //------------------------------------------------------------------------------------------
         while (opModeIsActive()) {
 
-            follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13;
+            follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13 ^ gamepad1.leftBumperWasPressed() ^ gamepad1.rightBumperWasPressed();
 
             //-----------------------------------------------DRIVETRAIN
             if (!follower_control) {
@@ -118,6 +120,13 @@ public class TELEOP_driver_c extends LinearOpMode {
                 if (gamepad1.right_trigger > 0.13 && gamepad1.left_trigger < 0.13) {
                     is_blue_alliance = false;
                     robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
+                }
+                if (!(gamepad1.right_trigger > 0.13 || gamepad1.left_trigger > 0.13)) {
+                    if (gamepad1.leftBumperWasPressed()) {
+                        robot.follower.turn(robot.findAprilStarBearing(false), true);
+                    } else if (gamepad1.rightBumperWasPressed()) {
+                        robot.follower.turn(robot.findAprilStarBearing(true), true);
+                    }
                 }
                 robot.follower.update();
                 //---------------------------------BOT HOLD ADJ GOAL
@@ -231,7 +240,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             telemetry.addData("| FLY > RPM/90D IA/STR IA + INT IA", "%.2f / %.2f / %.2f + %.2f", robot.getFlywheelRPM(), robot.flywheel.getCurrent(CurrentUnit.AMPS), robot.flywheel2.getCurrent(CurrentUnit.AMPS), robot.intake.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("| PPT > IMU-H-R/IMU-H-D/X.Pos/Y.Pos", "%.1f/ %.1f/ %.1f/ %.1f", robot.pinpoint.getHeading(AngleUnit.RADIANS), robot.pinpoint.getHeading(AngleUnit.DEGREES), robot.pinpoint.getPosX(DistanceUnit.INCH), robot.pinpoint.getPosY(DistanceUnit.INCH));
             telemetry.addData("| FLCKR > POS/STATE, HOOD > POS", "%.1f / %s, %.1f", robot.flicker.getPosition(), robot.flickState, robot.hood.getPosition());
-            telemetry.addData("| VISION > SEEN / DECIMATION / FPS", "%d / %d / %.1f", robot.aprilTPR.getDetections().size(), robot.currentDecimation, robot.visionPortal.getFps());
+            telemetry.addData("| VISION > SEEN/DECIMATION/FPS", "%d / %d / %.1f", robot.aprilTPR.getDetections().size(), robot.currentDecimation, robot.visionPortal.getFps());
             telemetry.addData(">>> || I was wrong. You're not greedy... You're bat-shit insane!", "omelettes!");
             telemetry.addData("| ALLIANCE / HYPT FROM / GOAL ∠D / RAW ∠D", "%s / %.1f / %.1f / %.1f", is_blue_alliance ? "BLUE" : "RED", robot.findGoalDistance(is_blue_alliance), robot.findGoalHeading(is_blue_alliance), robot.hallucination);
             telemetry.update();
