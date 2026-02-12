@@ -171,9 +171,13 @@ public class TELEOP_driver_c extends LinearOpMode {
                 in = !in;
                 out = false;
             }
-            if (gamepad1.aWasPressed()) {
+            if (gamepad1.dpadDownWasPressed()) {
                 out = !out;
                 in = false;
+            }
+            if (gamepad1.touchpadWasPressed()) {
+                robot.depression = true;
+                robot.dreams = 3;
             }
 
             if (gamepad1.dpadLeftWasPressed() && ultima_ratio) {
@@ -198,6 +202,8 @@ public class TELEOP_driver_c extends LinearOpMode {
             }
             if (in && (robot.flickState != (Invokation_of_a_False_Life.flickStates.UPWARDS) && (robot.flickState != Invokation_of_a_False_Life.flickStates.DOWNWARDS))) {
                 robot.intake.setPower(1);
+            } else if (in && (robot.flickState == Invokation_of_a_False_Life.flickStates.UPWARDS)) {
+                robot.intake.setPower(-0.3);
             } else if (out) {
                 robot.intake.setPower(-1);
             } else {
@@ -208,34 +214,38 @@ public class TELEOP_driver_c extends LinearOpMode {
 
 
             //-----------------------------------------------FLICKER FSM
-            switch (robot.flickState) {
-                case START:
-                    if (gamepad1.xWasPressed()) {
-                        flickerTime.reset();
-                        robot.flicker.setPosition(0.81); //go up
-                        robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
-                    }
-                    break;
-                case UPWARDS:
-                    if (flickerTime.seconds() >= 0.063) {
-                        flickerTime.reset();
-                        robot.flicker.setPosition(0); //go down
-                        robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
-                    }
-                    break;
-                case DOWNWARDS:
-                    if (flickerTime.seconds() >= 0.044) {
+            if (!robot.depression) {
+                switch (robot.flickState) {
+                    case START:
+                        if (gamepad1.xWasPressed()) {
+                            flickerTime.reset();
+                            robot.flicker.setPosition(0.81); //go up
+                            robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
+                        }
+                        break;
+                    case UPWARDS:
+                        if (flickerTime.seconds() >= 0.063) {
+                            flickerTime.reset();
+                            robot.flicker.setPosition(0); //go down
+                            robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
+                        }
+                        break;
+                    case DOWNWARDS:
+                        if (flickerTime.seconds() >= 0.044) {
+                            robot.flickState = Invokation_of_a_False_Life.flickStates.START;
+                        }
+                        break;
+                    default:
                         robot.flickState = Invokation_of_a_False_Life.flickStates.START;
-                    }
-                    break;
-                default:
-                    robot.flickState = Invokation_of_a_False_Life.flickStates.START;
+                }
             }
 
             //restart if button is re-pressed
-            if (gamepad1.xWasPressed() && robot.flickState != Invokation_of_a_False_Life.flickStates.START) {
+            if (gamepad1.xWasPressed() && (robot.flickState != Invokation_of_a_False_Life.flickStates.START || robot.depression)) {
                 robot.flickState = Invokation_of_a_False_Life.flickStates.START;
                 robot.flicker.setPosition(0);
+                robot.depression = false;
+                robot.dreams = 0;
             }
             //-----------------------------------------------FLICKER FSM
 
@@ -246,6 +256,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             robot.pinpoint.update();
             robot.follower.updatePose();
             robot.updHoodPos(robot.hoodState, is_blue_alliance);
+            robot.losing_dreams(flickerTime);
             //-----------------------------------------------UPDATES
 
 

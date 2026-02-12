@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.FocusControl;
@@ -69,6 +70,8 @@ public class Invokation_of_a_False_Life {
     hoodStates hoodState = hoodStates.NEAR;
 
     public double dream_of_flight = 1;
+    public int dreams = 0;
+    public boolean depression = false;
 
     Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 72, 72, AngleUnit. DEGREES, 0);
     Pose f_startingPose = PoseConverter.pose2DToPose(startingPose, InvertedFTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
@@ -83,7 +86,7 @@ public class Invokation_of_a_False_Life {
     FocusControl persistence;
     boolean cameraTraumatized = false;
 
-    PIDFCoefficients wishful_thinking = new PIDFCoefficients(173, 0, 0, 12.4);
+    PIDFCoefficients wishful_thinking = new PIDFCoefficients(135, 0, 1, 13.613);
 
     //---------------------- class creation ↑ --- methods ↓ -------
 
@@ -109,10 +112,18 @@ public class Invokation_of_a_False_Life {
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);  
+        if (self_will) {
+            frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        } else {
+            frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        }
+
         //actuator other
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
@@ -128,9 +139,9 @@ public class Invokation_of_a_False_Life {
 
         //pedropath init
         if (self_will) {
-            follower = Constants.createFollowerAuton(hwMap);
+            follower = Constants.createAngel(hwMap);
         } else {
-            follower = Constants.createFollowerTeleOp(hwMap);
+            follower = Constants.createFollower(hwMap);
         }
         follower.setStartingPose(f_startingPose);
         follower.updatePose();
@@ -278,11 +289,13 @@ public class Invokation_of_a_False_Life {
 
         if (hypotenuse <= 68) {
             //dream_of_flight = 0.73;
-            dream_of_flight = 3600;
+            dream_of_flight = 3444;
         } else if (hypotenuse > 68 && hypotenuse <= 80) {
             //dream_of_flight = 0.81;
             dream_of_flight = 4100;
-        } else if (hypotenuse > 80 && hypotenuse <= 119){
+        } else if (hypotenuse > 80 && hypotenuse <= 97) {
+            dream_of_flight = 4250;
+        } else if (hypotenuse > 97 && hypotenuse <= 119){
             //dream_of_flight = 0.86;
             dream_of_flight = 4400;
         } else {
@@ -299,6 +312,45 @@ public class Invokation_of_a_False_Life {
             currentDecimation = 2;
         }
     }
+
+    public void losing_dreams(ElapsedTime flickerTime) {
+        if (depression) {
+            switch (flickState) {
+                case START:
+                    flickerTime.reset();
+                    flicker.setPosition(0.81); //go up
+                    flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
+                    break;
+                case UPWARDS:
+                    if (flickerTime.seconds() >= 0.063) {
+                        flickerTime.reset();
+                        flicker.setPosition(0); //go down
+                        flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
+                    }
+                    break;
+                case DOWNWARDS:
+                    if (flickerTime.seconds() >= 0.044) {
+                        flickerTime.reset();
+                        dreams -= 1;
+                        flickState = Invokation_of_a_False_Life.flickStates.MOONLIGHT;
+                    }
+                    break;
+                case MOONLIGHT:
+                    if ((dreams > 1) && (flickerTime.seconds() >= 0.888)) {
+                        flickState = Invokation_of_a_False_Life.flickStates.START;
+                    } else if ((dreams == 1) && (flickerTime.seconds() >= 1.3)) {
+                        flickState = Invokation_of_a_False_Life.flickStates.START;
+                    } else if (dreams == 0) {
+                        depression = false;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+
 
 
     //information acquisition, output, and processing methods

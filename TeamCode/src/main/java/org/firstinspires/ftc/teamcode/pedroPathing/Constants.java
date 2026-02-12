@@ -51,7 +51,7 @@ public class Constants {
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
-    public static Follower createFollowerTeleOp(HardwareMap hardwareMap) {
+    public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstantsTeleOp, hardwareMap)
                 .pathConstraints(pathConstraints)
                 .mecanumDrivetrain(driveConstants)
@@ -60,7 +60,7 @@ public class Constants {
 
     }
 
-    public static Follower createFollowerAuton(HardwareMap hardwareMap) {
+    public static Follower createAngel(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstantsAuton,hardwareMap)
                 .pathConstraints(pathConstraints)
                 .mecanumDrivetrain(driveConstants)
