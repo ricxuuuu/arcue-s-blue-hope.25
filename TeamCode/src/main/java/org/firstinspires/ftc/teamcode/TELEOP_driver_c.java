@@ -171,11 +171,13 @@ public class TELEOP_driver_c extends LinearOpMode {
                 in = !in;
                 out = false;
             }
-            if (gamepad1.dpadDownWasPressed()) {
+            if (gamepad1.aWasPressed()) {
                 out = !out;
                 in = false;
             }
-            if (gamepad1.touchpadWasPressed()) {
+            if (gamepad1.rightStickButtonWasPressed()) {
+                in = true;
+                out = false;
                 robot.depression = true;
                 robot.dreams = 3;
             }
@@ -203,7 +205,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             if (in && (robot.flickState != (Invokation_of_a_False_Life.flickStates.UPWARDS) && (robot.flickState != Invokation_of_a_False_Life.flickStates.DOWNWARDS))) {
                 robot.intake.setPower(1);
             } else if (in && (robot.flickState == Invokation_of_a_False_Life.flickStates.UPWARDS)) {
-                robot.intake.setPower(-0.3);
+                robot.intake.setPower(-0.43);
             } else if (out) {
                 robot.intake.setPower(-1);
             } else {

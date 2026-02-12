@@ -336,9 +336,9 @@ public class Invokation_of_a_False_Life {
                     }
                     break;
                 case MOONLIGHT:
-                    if ((dreams > 1) && (flickerTime.seconds() >= 0.888)) {
+                    if ((dreams > 1) && (flickerTime.seconds() >= 0.270)) {
                         flickState = Invokation_of_a_False_Life.flickStates.START;
-                    } else if ((dreams == 1) && (flickerTime.seconds() >= 1.3)) {
+                    } else if ((dreams == 1) && (flickerTime.seconds() >= 0.5)) {
                         flickState = Invokation_of_a_False_Life.flickStates.START;
                     } else if (dreams == 0) {
                         depression = false;
