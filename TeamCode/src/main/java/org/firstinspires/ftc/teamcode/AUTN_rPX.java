@@ -114,6 +114,7 @@ public class AUTN_rPX extends LinearOpMode {
             //-----------------------------------------------UPDATES
             manageCalories();
             flightEnergyConservation(revTime);
+            actOnTheGut();
             robot.follower.update();
             robot.pinpoint.update();
             //-----------------------------------------------UPDATES
@@ -121,7 +122,7 @@ public class AUTN_rPX extends LinearOpMode {
 
             //-----------------------------------------------TELEMETRY
             telemetry.addData("---------------------//STATUS-RED", "hunting...");
-            //telemetry.addData("INTUITION", intuition);
+            telemetry.addData("INTUITION", intuition);
             telemetry.addData("FIRED", shotsFired);
             telemetry.addData("F_STATE/POS", "%s / %.2f", robot.flickState, robot.flicker.getPosition());
             telemetry.addData("F_TIME", flickerTime.seconds());
@@ -212,41 +213,45 @@ public class AUTN_rPX extends LinearOpMode {
 
     private void manageCalories() {
         if (in && (robot.flickState != (Invokation_of_a_False_Life.flickStates.UPWARDS) && (robot.flickState != Invokation_of_a_False_Life.flickStates.DOWNWARDS))) {
-            robot.intake.setPower(0.8);
+            robot.intake.setPower(1);
         } else if (in && (robot.flickState == Invokation_of_a_False_Life.flickStates.DOWNWARDS)) {
-            robot.intake.setPower(0.4);
+            robot.intake.setPower(0.2);
+        } else if (in) {
+            robot.intake.setPower(-0.6);
         } else {
             robot.intake.setPower(0);
         }
     }
 
     private void actOnTheGut() {
-        intuition = robot.findAprilStarBearing(true);
-        robot.follower.turnTo(intuition + robot.follower.getHeading());
+        if (!robot.follower.isBusy()) {
+            intuition = robot.findAprilStarBearing(false);
+            robot.follower.turn(intuition, true);
+        }
     } //experimental
 
     private void shootToKill(ElapsedTime flickerTime, ElapsedTime revTime) {
         switch (robot.flickState) {
             case START:
-                if (shotsFired < 4 && shotsFired != 0 && (revTime.seconds() > 1)) {
+                if (shotsFired < 4 && shotsFired != 0 && (revTime.seconds() > 0.7)) {
                     flickerTime.reset();
-                    robot.flicker.setPosition(0.73); //go up
+                    robot.flicker.setPosition(0.81); //go up
                     robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
                 } else if (shotsFired <= 0 && (revTime.seconds() > 1.7)) {
                     flickerTime.reset();
-                    robot.flicker.setPosition(0.73); //go up
+                    robot.flicker.setPosition(0.81); //go up
                     robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
                 }
                 break;
             case UPWARDS:
-                if (flickerTime.seconds() >= 0.177) {
+                if (flickerTime.seconds() >= 0.063) {
                     flickerTime.reset();
                     robot.flicker.setPosition(0); //go down
                     robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
                 }
                 break;
             case DOWNWARDS:
-                if (flickerTime.seconds() >= 0.133) {
+                if (flickerTime.seconds() >= 0.044) {
                     flickerTime.reset();
                     shotsFired += 1;
                     robot.flickState = Invokation_of_a_False_Life.flickStates.MOONLIGHT;

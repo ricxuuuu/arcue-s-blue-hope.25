@@ -5,12 +5,13 @@ import com.pedropathing.ftc.InvertedFTCCoordinates;
 import com.pedropathing.ftc.PoseConverter;
 import com.pedropathing.geometry.PedroCoordinates;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.ams.AMSColorSensor;
+import com.pedropathing.paths.Path;
+import com.pedropathing.geometry.BezierLine;
+
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
-import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -43,9 +44,6 @@ public class Invokation_of_a_False_Life {
     public Servo hood, flicker;
     GoBildaPinpointDriver pinpoint;
 
-    public double hallucination;
-    public int currentDecimation;
-
     public Follower follower;
     public AprilTagProcessor aprilTPR;
     public VisionPortal visionPortal;
@@ -72,6 +70,9 @@ public class Invokation_of_a_False_Life {
     public double dream_of_flight = 1;
     public int dreams = 0;
     public boolean depression = false;
+    public double hallucination;
+    public int currentDecimation;
+    private boolean sweets;
 
     Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 72, 72, AngleUnit. DEGREES, 0);
     Pose f_startingPose = PoseConverter.pose2DToPose(startingPose, InvertedFTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
@@ -142,6 +143,8 @@ public class Invokation_of_a_False_Life {
             follower = Constants.createAngel(hwMap);
         } else {
             follower = Constants.createFollower(hwMap);
+            follower.deactivateAllPIDFs();
+            follower.activateHeading();
         }
         follower.setStartingPose(f_startingPose);
         follower.updatePose();
@@ -350,7 +353,21 @@ public class Invokation_of_a_False_Life {
         }
     }
 
-
+    public void fear_facing(double tarHed) {
+        if (!follower.isBusy()) {
+            if (sweets) {
+                Path a1 = new Path(new BezierLine(new Pose(13, 13), new Pose(43, 13)));
+                a1.setConstantHeadingInterpolation(tarHed);
+                sweets = false;
+                follower.followPath(a1);
+            } else {
+                Path a2 = new Path(new BezierLine(new Pose (43, 13), new Pose(13, 13)));
+                a2.setConstantHeadingInterpolation(tarHed);
+                sweets = true;
+                follower.followPath(a2);
+            }
+        }
+    }
 
 
     //information acquisition, output, and processing methods

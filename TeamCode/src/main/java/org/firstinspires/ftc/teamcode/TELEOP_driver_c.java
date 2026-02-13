@@ -111,7 +111,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             } else if (gamepad1.rightBumperWasReleased()) {
                 turningR = false;
             }
-            follower_control = gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13 ^ turningB ^ turningR;
+            follower_control = (gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13 ^ turningB ^ turningR) || (robot.follower.isBusy());
 
             //-----------------------------------------------DRIVETRAIN
             if (!follower_control) {
@@ -127,16 +127,18 @@ public class TELEOP_driver_c extends LinearOpMode {
                 //---------------------------------BOT HOLD ADJ GOAL
                 if (gamepad1.left_trigger > 0.13 && gamepad1.right_trigger < 0.13) {
                     is_blue_alliance = true;
-                    robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
+                    //robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
+                    robot.fear_facing(robot.findGoalHeading(is_blue_alliance));
                 }
                 if (gamepad1.right_trigger > 0.13 && gamepad1.left_trigger < 0.13) {
                     is_blue_alliance = false;
-                    robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
+                    //robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
+                    robot.fear_facing(robot.findGoalHeading(is_blue_alliance));
                 }
-                if (turningB) {
+                if (turningB && gamepad1.left_trigger < 0.13 && gamepad1.right_trigger < 0.13) {
                     is_blue_alliance = true;
                     robot.follower.turn(robot.findAprilStarBearing(false), true);
-                } else if (turningR) {
+                } else if (turningR && gamepad1.left_trigger < 0.13 && gamepad1.right_trigger < 0.13) {
                     is_blue_alliance = false;
                     robot.follower.turn(robot.findAprilStarBearing(true), true);
                 }
