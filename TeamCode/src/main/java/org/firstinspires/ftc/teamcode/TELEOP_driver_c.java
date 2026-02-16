@@ -76,7 +76,7 @@ public class TELEOP_driver_c extends LinearOpMode {
         telemetry.addData("01/", "#Configuring Camera...");
         telemetry.update();
         //||||||||||||||||||||||||||||||||||||||//
-        robot.traumatizeCamera(7, 213);
+        robot.traumatizeCamera(7, 177);
         //-----------------------------------------------PREP
         //||||||||||||||||||||||||||||||||||||||//
         telemetry.addData("01/", "ごめん あまない 俺は今お前のために怒ってない");
@@ -111,7 +111,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             } else if (gamepad1.rightBumperWasReleased()) {
                 turningR = false;
             }
-            follower_control = (gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13 ^ turningB ^ turningR) || (robot.follower.isBusy());
+            follower_control = (gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13 ^ turningB ^ turningR);
 
             //-----------------------------------------------DRIVETRAIN
             if (!follower_control) {
@@ -127,13 +127,11 @@ public class TELEOP_driver_c extends LinearOpMode {
                 //---------------------------------BOT HOLD ADJ GOAL
                 if (gamepad1.left_trigger > 0.13 && gamepad1.right_trigger < 0.13) {
                     is_blue_alliance = true;
-                    //robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
-                    robot.fear_facing(robot.findGoalHeading(is_blue_alliance));
+                    robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
                 }
                 if (gamepad1.right_trigger > 0.13 && gamepad1.left_trigger < 0.13) {
                     is_blue_alliance = false;
-                    //robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
-                    robot.fear_facing(robot.findGoalHeading(is_blue_alliance));
+                    robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
                 }
                 if (turningB && gamepad1.left_trigger < 0.13 && gamepad1.right_trigger < 0.13) {
                     is_blue_alliance = true;
@@ -207,7 +205,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             if (in && (robot.flickState != (Invokation_of_a_False_Life.flickStates.UPWARDS) && (robot.flickState != Invokation_of_a_False_Life.flickStates.DOWNWARDS))) {
                 robot.intake.setPower(1);
             } else if (in && (robot.flickState == Invokation_of_a_False_Life.flickStates.UPWARDS)) {
-                robot.intake.setPower(-0.43);
+                robot.intake.setPower(0);
             } else if (out) {
                 robot.intake.setPower(-1);
             } else {
@@ -228,14 +226,14 @@ public class TELEOP_driver_c extends LinearOpMode {
                         }
                         break;
                     case UPWARDS:
-                        if (flickerTime.seconds() >= 0.063) {
+                        if (flickerTime.seconds() >= 0.177) {
                             flickerTime.reset();
                             robot.flicker.setPosition(0); //go down
                             robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
                         }
                         break;
                     case DOWNWARDS:
-                        if (flickerTime.seconds() >= 0.044) {
+                        if (flickerTime.seconds() >= 0.133) {
                             robot.flickState = Invokation_of_a_False_Life.flickStates.START;
                         }
                         break;

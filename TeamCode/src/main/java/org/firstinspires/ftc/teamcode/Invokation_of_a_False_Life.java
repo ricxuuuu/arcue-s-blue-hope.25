@@ -72,7 +72,6 @@ public class Invokation_of_a_False_Life {
     public boolean depression = false;
     public double hallucination;
     public int currentDecimation;
-    private boolean sweets;
 
     Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 72, 72, AngleUnit. DEGREES, 0);
     Pose f_startingPose = PoseConverter.pose2DToPose(startingPose, InvertedFTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
@@ -295,12 +294,12 @@ public class Invokation_of_a_False_Life {
             dream_of_flight = 3444;
         } else if (hypotenuse > 68 && hypotenuse <= 80) {
             //dream_of_flight = 0.81;
-            dream_of_flight = 4100;
+            dream_of_flight = 4000;
         } else if (hypotenuse > 80 && hypotenuse <= 97) {
-            dream_of_flight = 4250;
+            dream_of_flight = 4150;
         } else if (hypotenuse > 97 && hypotenuse <= 119){
             //dream_of_flight = 0.86;
-            dream_of_flight = 4400;
+            dream_of_flight = 4300;
         } else {
             dream_of_flight = 1;
         }
@@ -349,22 +348,6 @@ public class Invokation_of_a_False_Life {
                     break;
                 default:
                     break;
-            }
-        }
-    }
-
-    public void fear_facing(double tarHed) {
-        if (!follower.isBusy()) {
-            if (sweets) {
-                Path a1 = new Path(new BezierLine(new Pose(13, 13), new Pose(43, 13)));
-                a1.setConstantHeadingInterpolation(tarHed);
-                sweets = false;
-                follower.followPath(a1);
-            } else {
-                Path a2 = new Path(new BezierLine(new Pose (43, 13), new Pose(13, 13)));
-                a2.setConstantHeadingInterpolation(tarHed);
-                sweets = true;
-                follower.followPath(a2);
             }
         }
     }
