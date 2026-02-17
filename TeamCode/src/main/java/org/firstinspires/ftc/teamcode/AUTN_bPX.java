@@ -249,14 +249,14 @@ public class AUTN_bPX extends LinearOpMode {
                 }
                 break;
             case UPWARDS:
-                if (flickerTime.seconds() >= 0.063) {
+                if (flickerTime.seconds() >= 0.1) {
                     flickerTime.reset();
                     robot.flicker.setPosition(0); //go down
                     robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
                 }
                 break;
             case DOWNWARDS:
-                if (flickerTime.seconds() >= 0.044) {
+                if (flickerTime.seconds() >= 0.075) {
                     flickerTime.reset();
                     shotsFired += 1;
                     robot.flickState = Invokation_of_a_False_Life.flickStates.MOONLIGHT;

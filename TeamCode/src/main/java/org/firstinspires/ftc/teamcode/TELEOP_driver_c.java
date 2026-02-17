@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.internal.camera.CameraState;
 
 //⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⢻⣿⣿⣿⡿⠙⠉⣉⡉⠉⠉⠉⠉⠉⠉⣉⡉⠉⠛⢯⣍⠉⠉⠉⠙⢟⡋⢉⣽⣿⣿⣏⠉⠉⠉⠉⢉⣉⣉⣉⣉⣉⡉⠭⠭⠭⠭
 //⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠳⡄⠀⠀⠀⠀⠀⢸⡼⠟⠁⠀⣠⣾⡿⠀⢀⣤⡀⠀⠀⢶⣿⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⡿⠃⠙⢷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -128,13 +129,11 @@ public class TELEOP_driver_c extends LinearOpMode {
                 //---------------------------------BOT HOLD ADJ GOAL
                 if (gamepad1.left_trigger > 0.13 && gamepad1.right_trigger < 0.13) {
                     is_blue_alliance = true;
-                    //robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
-                    robot.fear_facing(robot.findGoalHeading(is_blue_alliance));
+                    robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
                 }
                 if (gamepad1.right_trigger > 0.13 && gamepad1.left_trigger < 0.13) {
                     is_blue_alliance = false;
-                    //robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
-                    robot.fear_facing(robot.findGoalHeading(is_blue_alliance));
+                    robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
                 }
                 if (turningB && gamepad1.left_trigger < 0.13 && gamepad1.right_trigger < 0.13) {
                     is_blue_alliance = true;
@@ -185,7 +184,13 @@ public class TELEOP_driver_c extends LinearOpMode {
                 robot.dreams = 3;
             }
             if (gamepad1.psWasPressed()) {
-                robot.pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 63.28, 0, AngleUnit.DEGREES, 180));
+                if (is_blue_alliance) {
+                    robot.pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 64.7, 63.1, AngleUnit.DEGREES, -90));
+                } else {
+                    robot.pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 64.7, -63.1, AngleUnit.DEGREES, 90));
+                }
+                robot.visionPortal.close();
+
             }
 
             if (gamepad1.dpadLeftWasPressed() && ultima_ratio) {
@@ -232,14 +237,14 @@ public class TELEOP_driver_c extends LinearOpMode {
                         }
                         break;
                     case UPWARDS:
-                        if (flickerTime.seconds() >= 0.177) {
+                        if (flickerTime.seconds() >= 0.135 ) {
                             flickerTime.reset();
                             robot.flicker.setPosition(0); //go down
                             robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
                         }
                         break;
                     case DOWNWARDS:
-                        if (flickerTime.seconds() >= 0.133) {
+                        if (flickerTime.seconds() >= 0.075) {
                             robot.flickState = Invokation_of_a_False_Life.flickStates.START;
                         }
                         break;
@@ -277,6 +282,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             telemetry.addData("| FLCKR > POS/STATE, HOOD > POS", "%.1f / %s, %.1f", robot.flicker.getPosition(), robot.flickState, robot.hood.getPosition());
             telemetry.addData("| VISION > SEEN/DECIMATION/FPS", "%d / %d / %.1f", robot.aprilTPR.getDetections().size(), robot.currentDecimation, robot.visionPortal.getFps());
             telemetry.addData(">>> || I was wrong. You're not greedy... You're bat-shit insane!", "omelettes!");
+            telemetry.addData("hfwofjaw", robot.follower.getHeading());
             telemetry.addData("| ALLIANCE / HYPT FROM / GOAL ∠D / RAW ∠D", "%s / %.1f / %.1f / %.1f", is_blue_alliance ? "BLUE" : "RED", robot.findGoalDistance(is_blue_alliance), robot.findGoalHeading(is_blue_alliance), robot.hallucination);
             telemetry.update();
             //-----------------------------------------------TELEMETRY

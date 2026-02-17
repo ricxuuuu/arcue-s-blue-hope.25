@@ -143,7 +143,7 @@ public class Invokation_of_a_False_Life {
         if (self_will) {
             follower = Constants.createAngel(hwMap);
         } else {
-            follower = Constants.createFollower(hwMap);
+            follower = Constants.createAngel(hwMap);
             follower.deactivateAllPIDFs();
             follower.activateHeading();
         }
@@ -326,14 +326,14 @@ public class Invokation_of_a_False_Life {
                     flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
                     break;
                 case UPWARDS:
-                    if (flickerTime.seconds() >= 0.063) {
+                    if (flickerTime.seconds() >= 0.1) {
                         flickerTime.reset();
                         flicker.setPosition(0); //go down
                         flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
                     }
                     break;
                 case DOWNWARDS:
-                    if (flickerTime.seconds() >= 0.044) {
+                    if (flickerTime.seconds() >= 0.075) {
                         flickerTime.reset();
                         dreams -= 1;
                         flickState = Invokation_of_a_False_Life.flickStates.MOONLIGHT;
@@ -353,24 +353,6 @@ public class Invokation_of_a_False_Life {
             }
         }
     }
-
-    public void fear_facing(double fear) {
-        if (!follower.isBusy()) {
-            fear = MathFunctions.normalizeAngleSigned(follower.getHeading() + MathFunctions.getSmallestAngleDifference(follower.getHeading(), fear));
-            if (fearful) {
-                Path ah = (new Path(new BezierLine(new Pose(72,72), new Pose(43 + 72,72))));
-                ah.setConstantHeadingInterpolation(fear);
-                follower.followPath(ah);
-            } else {
-                Path ah = (new Path(new BezierLine(new Pose(43 + 72,72), new Pose(72,72))));
-                ah.setConstantHeadingInterpolation(fear);
-                follower.followPath(ah);
-            }
-            fearful = !fearful;
-            follower.update();
-        }
-    }
-
 
     //information acquisition, output, and processing methods
     public double getFlywheelRPM() {
