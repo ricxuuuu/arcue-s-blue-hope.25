@@ -3,11 +3,12 @@ package org.firstinspires.ftc.teamcode;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ftc.InvertedFTCCoordinates;
 import com.pedropathing.ftc.PoseConverter;
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.PedroCoordinates;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.Path;
-import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.math.MathFunctions;
 
+import com.pedropathing.paths.Path;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -72,6 +73,7 @@ public class Invokation_of_a_False_Life {
     public boolean depression = false;
     public double hallucination;
     public int currentDecimation;
+    public boolean fearful;
 
     Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 72, 72, AngleUnit. DEGREES, 0);
     Pose f_startingPose = PoseConverter.pose2DToPose(startingPose, InvertedFTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
@@ -352,6 +354,23 @@ public class Invokation_of_a_False_Life {
         }
     }
 
+    public void fear_facing(double fear) {
+        if (!follower.isBusy()) {
+            fear = MathFunctions.normalizeAngleSigned(follower.getHeading() + MathFunctions.getSmallestAngleDifference(follower.getHeading(), fear));
+            if (fearful) {
+                Path ah = (new Path(new BezierLine(new Pose(72,72), new Pose(43 + 72,72))));
+                ah.setConstantHeadingInterpolation(fear);
+                follower.followPath(ah);
+            } else {
+                Path ah = (new Path(new BezierLine(new Pose(43 + 72,72), new Pose(72,72))));
+                ah.setConstantHeadingInterpolation(fear);
+                follower.followPath(ah);
+            }
+            fearful = !fearful;
+            follower.update();
+        }
+    }
+
 
     //information acquisition, output, and processing methods
     public double getFlywheelRPM() {
@@ -428,17 +447,30 @@ public class Invokation_of_a_False_Life {
         return angle_given; //heading 0 facing audience / north if X is vert.
     }
 
-    public double findAprilStarBearing(boolean red) { //currently unused
+    public double findAprilStarBearing(boolean red) {
         hallucination = 0;
+        double posX = pinpoint.getPosX(DistanceUnit.INCH);
         List<AprilTagDetection> currentDetections = aprilTPR.getDetections();
         for (AprilTagDetection detection : currentDetections) {
             if (red && detection.id == 24) {
                 hallucination = detection.ftcPose.bearing;
-                hallucination -= 3;
+                if (posX > 24) {
+                    hallucination += 3;
+                } else if (posX < -48) {
+                    hallucination -= 7;
+                } else if (posX < -24) {
+                    hallucination -= 4;
+                }
                 break;
             } else if (!red && detection.id == 20) {
                 hallucination = detection.ftcPose.bearing;
-                hallucination += 3;
+                if (posX > 24) {
+                    hallucination -= 3;
+                } else if (posX < -48) {
+                    hallucination += 7;
+                } else if (posX < -24) {
+                    hallucination += 4;
+                }
                 break;
             }
         }

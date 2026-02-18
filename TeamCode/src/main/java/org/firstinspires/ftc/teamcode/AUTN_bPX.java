@@ -73,6 +73,7 @@ public class AUTN_bPX extends LinearOpMode {
                         revTime.reset();
                     }
                     if (!robot.follower.isBusy()) {
+                        actOnTheGut();
                         shootToKill(flickerTime, revTime);
                         if (shotsFired >= 4) {
                             robot.follower.followPath(scoreB, true);
@@ -83,6 +84,7 @@ public class AUTN_bPX extends LinearOpMode {
                     break;
                 case 2:
                     if (!robot.follower.isBusy()) {
+                        actOnTheGut();
                         shootToKill(flickerTime, revTime);
                         if (shotsFired >= 3) {
                             robot.follower.followPath(scoreM, true);
@@ -93,6 +95,7 @@ public class AUTN_bPX extends LinearOpMode {
                     break;
                 case 3:
                     if (!robot.follower.isBusy()) {
+                        actOnTheGut();
                         shootToKill(flickerTime, revTime);
                         if (shotsFired >= 3) {
                             robot.follower.followPath(runAway, true);
@@ -226,7 +229,9 @@ public class AUTN_bPX extends LinearOpMode {
     private void actOnTheGut() {
         if (!robot.follower.isBusy()) {
             intuition = robot.findAprilStarBearing(false);
-            robot.follower.turn(intuition, true);
+            if (Math.abs(intuition) > 4) {
+                robot.follower.turn(intuition, true);
+            }
         }
     } //experimental
 

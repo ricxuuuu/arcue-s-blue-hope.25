@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 //⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⢻⣿⣿⣿⡿⠙⠉⣉⡉⠉⠉⠉⠉⠉⠉⣉⡉⠉⠛⢯⣍⠉⠉⠉⠙⢟⡋⢉⣽⣿⣿⣏⠉⠉⠉⠉⢉⣉⣉⣉⣉⣉⡉⠭⠭⠭⠭
 //⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠳⡄⠀⠀⠀⠀⠀⢸⡼⠟⠁⠀⣠⣾⡿⠀⢀⣤⡀⠀⠀⢶⣿⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⡿⠃⠙⢷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -127,11 +128,13 @@ public class TELEOP_driver_c extends LinearOpMode {
                 //---------------------------------BOT HOLD ADJ GOAL
                 if (gamepad1.left_trigger > 0.13 && gamepad1.right_trigger < 0.13) {
                     is_blue_alliance = true;
-                    robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
+                    //robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
+                    robot.fear_facing(robot.findGoalHeading(is_blue_alliance));
                 }
                 if (gamepad1.right_trigger > 0.13 && gamepad1.left_trigger < 0.13) {
                     is_blue_alliance = false;
-                    robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
+                    //robot.follower.turnTo(robot.findGoalHeading(is_blue_alliance));
+                    robot.fear_facing(robot.findGoalHeading(is_blue_alliance));
                 }
                 if (turningB && gamepad1.left_trigger < 0.13 && gamepad1.right_trigger < 0.13) {
                     is_blue_alliance = true;
@@ -180,6 +183,9 @@ public class TELEOP_driver_c extends LinearOpMode {
                 out = false;
                 robot.depression = true;
                 robot.dreams = 3;
+            }
+            if (gamepad1.psWasPressed()) {
+                robot.pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 63.28, 0, AngleUnit.DEGREES, 180));
             }
 
             if (gamepad1.dpadLeftWasPressed() && ultima_ratio) {
