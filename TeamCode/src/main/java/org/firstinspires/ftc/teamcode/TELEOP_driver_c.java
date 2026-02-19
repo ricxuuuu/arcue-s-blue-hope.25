@@ -208,7 +208,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             if (gamepad1.touchpadWasPressed()) {
                 if (robot.visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
                     robot.visionPortal.resumeStreaming();
-                    gamepad1.rumble(0.4, 0.4, 2222);
+                    gamepad1.rumble(0.43, 0.13, 2222);
                     robot.just_a_cog = false;
                 }
             }
@@ -288,6 +288,9 @@ public class TELEOP_driver_c extends LinearOpMode {
                 if (!is_blue_alliance) {
                     gamepad1.setLedColor(255, 67, 101, 133);
                 }
+            }
+            if (robot.flickState == Invokation_of_a_False_Life.flickStates.UPWARDS) {
+                gamepad1.rumble(0.33,0.33,135);
             }
             //-----------------------------------------------DRIVER FEEDBACK
 
