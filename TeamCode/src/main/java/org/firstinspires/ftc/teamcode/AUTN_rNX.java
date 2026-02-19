@@ -242,7 +242,7 @@ public class AUTN_rNX extends LinearOpMode {
                 }
                 break;
             case UPWARDS:
-                if (flickerTime.seconds() >= 0.1) {
+                if (flickerTime.seconds() >= 0.135) {
                     flickerTime.reset();
                     robot.flicker.setPosition(0); //go down
                     robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;

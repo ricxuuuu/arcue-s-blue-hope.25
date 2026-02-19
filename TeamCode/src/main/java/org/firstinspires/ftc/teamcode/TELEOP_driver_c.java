@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.internal.camera.CameraState;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 //⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⢻⣿⣿⣿⡿⠙⠉⣉⡉⠉⠉⠉⠉⠉⠉⣉⡉⠉⠛⢯⣍⠉⠉⠉⠙⢟⡋⢉⣽⣿⣿⣏⠉⠉⠉⠉⢉⣉⣉⣉⣉⣉⡉⠭⠭⠭⠭
 //⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠳⡄⠀⠀⠀⠀⠀⢸⡼⠟⠁⠀⣠⣾⡿⠀⢀⣤⡀⠀⠀⢶⣿⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⡿⠃⠙⢷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -103,6 +104,8 @@ public class TELEOP_driver_c extends LinearOpMode {
         //------------------------------------------------------------------------------------------
         while (opModeIsActive()) {
 
+
+            //-----------------------------------------------DRIVETRAIN
             if (gamepad1.leftBumperWasPressed()) {
                 turningB = true;
             } else if (gamepad1.rightBumperWasPressed()) {
@@ -115,7 +118,6 @@ public class TELEOP_driver_c extends LinearOpMode {
             }
             follower_control = (gamepad1.left_trigger > 0.13 ^ gamepad1.right_trigger > 0.13 ^ turningB ^ turningR);
 
-            //-----------------------------------------------DRIVETRAIN
             if (!follower_control) {
                 //---------------------------------MANUAL CONTROL
                 double axial = -gamepad1.left_stick_y; // forward/back
@@ -148,20 +150,27 @@ public class TELEOP_driver_c extends LinearOpMode {
             //-----------------------------------------------DRIVETRAIN
 
 
+
             //-----------------------------------------------PARTIAL_IDEALIZE
             if (!ultima_ratio) {
                 robot.idealizeFlightSpeed(is_blue_alliance);
                 robot.idealizeHoodState(is_blue_alliance);
                 gamepad1.stopRumble();
             } else {
-                if (!gamepad1.isRumbling()) {
-                    gamepad1.rumble(0.2, 0.2, 1333);
+                if (gamepad1.dpadLeftWasPressed()) {
+                    robot.hoodState = Invokation_of_a_False_Life.hoodStates.LUNAR_L1_NEAR;
+                } else if (gamepad1.dpadUpWasPressed()) {
+                    robot.hoodState = Invokation_of_a_False_Life.hoodStates.LUNAR_L3_MID;
+                } else if (gamepad1.dpadRightWasPressed()) {
+                    robot.hoodState = Invokation_of_a_False_Life.hoodStates.LUNAR_L2_FAR;
                 }
+                robot.where_are_those_who_share_the_memory();
             }
             //-----------------------------------------------PARTIAL_IDEALIZE
 
 
-            //-----------------------------------------------INTAKE/FLY
+
+            //-----------------------------------------------INTAKE/FLY/STUFF
             //set status
             if(gamepad1.shareWasPressed()) {
                 ultima_ratio = !ultima_ratio;
@@ -177,7 +186,7 @@ public class TELEOP_driver_c extends LinearOpMode {
                 out = !out;
                 in = false;
             }
-            if (gamepad1.rightStickButtonWasPressed()) {
+            if (gamepad1.rightStickButtonWasPressed() || gamepad1.leftStickButtonWasPressed()) {
                 in = true;
                 out = false;
                 robot.depression = true;
@@ -189,48 +198,45 @@ public class TELEOP_driver_c extends LinearOpMode {
                 } else {
                     robot.pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 64.7, -63.1, AngleUnit.DEGREES, 90));
                 }
-                robot.visionPortal.close();
-
+                robot.visionPortal.stopStreaming();
+                robot.just_a_cog = true;
+                gamepad1.rumble(0.7, 0.7, 333);
             }
-
-            if (gamepad1.dpadLeftWasPressed() && ultima_ratio) {
-                robot.hoodState = Invokation_of_a_False_Life.hoodStates.NEAR;
-            } else if (gamepad1.dpadUpWasPressed() && ultima_ratio) {
-                robot.hoodState = Invokation_of_a_False_Life.hoodStates.MID;
-            } else if (gamepad1.dpadRightWasPressed() && ultima_ratio) {
-                robot.hoodState = Invokation_of_a_False_Life.hoodStates.FAR;
+            if (gamepad1.optionsWasPressed()) {
+                robot.the_light_at_the_end_of_the_tunnel = !robot.the_light_at_the_end_of_the_tunnel;
+            }
+            if (gamepad1.touchpadWasPressed()) {
+                if (robot.visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+                    robot.visionPortal.resumeStreaming();
+                    gamepad1.rumble(0.4, 0.4, 2222);
+                    robot.just_a_cog = false;
+                }
             }
 
             //control based on status
-            if (fly && !ultima_ratio) {
-                if (robot.dream_of_flight == 1) {
-                    robot.setFlywheelPower(1);
-                } else {
-                    robot.setFlywheelSpeed(robot.dream_of_flight);
-                }
-            } else if (fly) {
-                robot.setFlywheelPower(1);
+            if (fly) {
+                robot.setFlywheelSpeed(robot.dream_of_flight);
             } else {
                 robot.setFlywheelPower(0);
             }
             if (in && (robot.flickState != (Invokation_of_a_False_Life.flickStates.UPWARDS) && (robot.flickState != Invokation_of_a_False_Life.flickStates.DOWNWARDS))) {
                 robot.intake.setPower(1);
             } else if (in && (robot.flickState == Invokation_of_a_False_Life.flickStates.UPWARDS)) {
-                robot.intake.setPower(0);
+                robot.intake.setPower(-0.1);
             } else if (out) {
                 robot.intake.setPower(-1);
             } else {
                 robot.intake.setPower(0);
             }
+            //-----------------------------------------------INTAKE/FLY/STUFF
 
-            //-----------------------------------------------INTAKE/FLY
 
 
             //-----------------------------------------------FLICKER FSM
             if (!robot.depression) {
                 switch (robot.flickState) {
                     case START:
-                        if (gamepad1.xWasPressed()) {
+                        if (gamepad1.xWasPressed() && flickerTime.seconds() >= 0.2) {
                             flickerTime.reset();
                             robot.flicker.setPosition(0.81); //go up
                             robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
@@ -245,6 +251,7 @@ public class TELEOP_driver_c extends LinearOpMode {
                         break;
                     case DOWNWARDS:
                         if (flickerTime.seconds() >= 0.075) {
+                            flickerTime.reset();
                             robot.flickState = Invokation_of_a_False_Life.flickStates.START;
                         }
                         break;
@@ -254,13 +261,36 @@ public class TELEOP_driver_c extends LinearOpMode {
             }
 
             //restart if button is re-pressed
-            if (gamepad1.xWasPressed() && (robot.flickState != Invokation_of_a_False_Life.flickStates.START || robot.depression)) {
+            //if (gamepad1.xWasPressed() && (robot.flickState != Invokation_of_a_False_Life.flickStates.START || robot.depression)) {
+            //reset for triple shot of dreams
+            if (robot.depression) {
                 robot.flickState = Invokation_of_a_False_Life.flickStates.START;
                 robot.flicker.setPosition(0);
                 robot.depression = false;
                 robot.dreams = 0;
             }
             //-----------------------------------------------FLICKER FSM
+
+
+
+            //-----------------------------------------------DRIVER FEEDBACK
+            if (ultima_ratio) {
+                if (!gamepad1.isRumbling()) {
+                    gamepad1.rumble(0.2, 0.2, 1333);
+                }
+            }
+            if (robot.the_light_at_the_end_of_the_tunnel) {
+                gamepad1.setLedColor(255,255,255, 133);
+            } else {
+                if (is_blue_alliance) {
+                    gamepad1.setLedColor(38, 103, 255, 133);
+                }
+                if (!is_blue_alliance) {
+                    gamepad1.setLedColor(255, 67, 101, 133);
+                }
+            }
+            //-----------------------------------------------DRIVER FEEDBACK
+
 
 
             //-----------------------------------------------UPDATES
@@ -282,7 +312,6 @@ public class TELEOP_driver_c extends LinearOpMode {
             telemetry.addData("| FLCKR > POS/STATE, HOOD > POS", "%.1f / %s, %.1f", robot.flicker.getPosition(), robot.flickState, robot.hood.getPosition());
             telemetry.addData("| VISION > SEEN/DECIMATION/FPS", "%d / %d / %.1f", robot.aprilTPR.getDetections().size(), robot.currentDecimation, robot.visionPortal.getFps());
             telemetry.addData(">>> || I was wrong. You're not greedy... You're bat-shit insane!", "omelettes!");
-            telemetry.addData("hfwofjaw", robot.follower.getHeading());
             telemetry.addData("| ALLIANCE / HYPT FROM / GOAL ∠D / RAW ∠D", "%s / %.1f / %.1f / %.1f", is_blue_alliance ? "BLUE" : "RED", robot.findGoalDistance(is_blue_alliance), robot.findGoalHeading(is_blue_alliance), robot.hallucination);
             telemetry.update();
             //-----------------------------------------------TELEMETRY

@@ -3,12 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ftc.InvertedFTCCoordinates;
 import com.pedropathing.ftc.PoseConverter;
-import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.PedroCoordinates;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.math.MathFunctions;
 
-import com.pedropathing.paths.Path;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -65,15 +62,16 @@ public class Invokation_of_a_False_Life {
     public enum flickStates {START,UPWARDS,DOWNWARDS,MOONLIGHT}
     flickStates flickState = flickStates.START;
 
-    public enum hoodStates {NEAR,MID,FAR,CHICKEN_RASPBERRY,HORIZON_ROSEMARY}
-    hoodStates hoodState = hoodStates.NEAR;
+    public enum hoodStates {LUNAR_L1_NEAR,LUNAR_L3_MID,LUNAR_L2_FAR,CHICKEN_RASPBERRY,HORIZON_ROSEMARY}
+    hoodStates hoodState = hoodStates.LUNAR_L1_NEAR;
 
     public double dream_of_flight = 1;
     public int dreams = 0;
     public boolean depression = false;
     public double hallucination;
     public int currentDecimation;
-    public boolean fearful;
+    public boolean just_a_cog = false;
+    public boolean the_light_at_the_end_of_the_tunnel = false;
 
     Pose2D startingPose = new Pose2D(DistanceUnit. INCH, 72, 72, AngleUnit. DEGREES, 0);
     Pose f_startingPose = PoseConverter.pose2DToPose(startingPose, InvertedFTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
@@ -141,9 +139,9 @@ public class Invokation_of_a_False_Life {
 
         //pedropath init
         if (self_will) {
-            follower = Constants.createAngel(hwMap);
+            follower = Constants.summonAngel(hwMap);
         } else {
-            follower = Constants.createAngel(hwMap);
+            follower = Constants.createFollower(hwMap);
             follower.deactivateAllPIDFs();
             follower.activateHeading();
         }
@@ -215,13 +213,22 @@ public class Invokation_of_a_False_Life {
     public void drive(double axial, double lateral, double yaw) {
 
         // imperfect strafe compensation
-        lateral *= 1;
+        // unused because i want to go fast forward
+        // and i don't care about strafing anymore
+        // lateral *= 1;
 
         // mecanum calculations
         double fl = (axial + lateral + yaw);
         double bl = (axial - lateral + yaw);
         double fr = (axial - lateral - yaw);
         double br = (axial + lateral - yaw);
+
+        if (the_light_at_the_end_of_the_tunnel) {
+            fl = fl * 0.333;
+            bl = bl * 0.333;
+            fr = fr * 0.333;
+            br = br * 0.333;
+        }
 
         // Normalize wheel powers
         double max = Math.max(1.0,
@@ -241,8 +248,13 @@ public class Invokation_of_a_False_Life {
     }
 
     public void setFlywheelSpeed(double rpm) {
-        flywheel.setVelocity(28 * rpm / 60);
-        flywheel2.setVelocity(28 * rpm / 60);
+        if (rpm == 1) {
+            flywheel.setPower(1);
+            flywheel2.setPower(1);
+        } else {
+            flywheel.setVelocity(28 * rpm / 60);
+            flywheel2.setVelocity(28 * rpm / 60);
+        }
     }
 
     public void rechain_motion() {
@@ -262,15 +274,15 @@ public class Invokation_of_a_False_Life {
             hood.setPosition(1);
             return;
         }
-        if (hoodState == hoodStates.NEAR) {
+        if (hoodState == hoodStates.LUNAR_L1_NEAR) {
             hood.setPosition(0);
             return;
         }
-        if (hoodState == hoodStates.MID) {
+        if (hoodState == hoodStates.LUNAR_L3_MID) {
             hood.setPosition(0.4);
             return;
         }
-        if (hoodState == hoodStates.FAR) {
+        if (hoodState == hoodStates.LUNAR_L2_FAR) {
             hood.setPosition(1);
         }
 
@@ -281,10 +293,8 @@ public class Invokation_of_a_False_Life {
 
         if (hypotenuse <= 64) {
             hoodState = hoodStates.CHICKEN_RASPBERRY;
-        } else if (hypotenuse > 64 && hypotenuse <= 119) {
+        } else {
             hoodState = hoodStates.HORIZON_ROSEMARY;
-        } else if (hypotenuse >119) {
-            hoodState = hoodStates.FAR;
         }
     }
 
@@ -303,6 +313,20 @@ public class Invokation_of_a_False_Life {
             //dream_of_flight = 0.86;
             dream_of_flight = 4300;
         } else {
+            dream_of_flight = 1;
+        }
+    }
+
+    public void where_are_those_who_share_the_memory() {
+        if (hoodState == hoodStates.LUNAR_L1_NEAR) {
+            dream_of_flight = 3444;
+            return;
+        }
+        if (hoodState == hoodStates.LUNAR_L3_MID) {
+            dream_of_flight = 4300;
+            return;
+        }
+        if (hoodState == hoodStates.LUNAR_L2_FAR) {
             dream_of_flight = 1;
         }
     }
@@ -326,7 +350,7 @@ public class Invokation_of_a_False_Life {
                     flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
                     break;
                 case UPWARDS:
-                    if (flickerTime.seconds() >= 0.1) {
+                    if (flickerTime.seconds() >= 0.133) {
                         flickerTime.reset();
                         flicker.setPosition(0); //go down
                         flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
@@ -353,6 +377,7 @@ public class Invokation_of_a_False_Life {
             }
         }
     }
+
 
     //information acquisition, output, and processing methods
     public double getFlywheelRPM() {
@@ -386,28 +411,33 @@ public class Invokation_of_a_False_Life {
     }
 
     public void runAprilAstroNavigation() {
-        List<AprilTagDetection> currentDetections = aprilTPR.getDetections();
-        for (AprilTagDetection detection : currentDetections) {
-            if (detection.id == 24) {
-                hallucination = detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES);
-                if (hallucination < 90 && hallucination > 0) {
-                    pinpoint.setPosition(new Pose2D(
-                            DistanceUnit.MM,
-                            detection.robotPose.getPosition().x,
-                            detection.robotPose.getPosition().y,
-                            AngleUnit.DEGREES,
-                            star_AntiDelusion(true, hallucination)));
+        if (just_a_cog) {
+            return;
+        }
+        if (visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
+            List<AprilTagDetection> currentDetections = aprilTPR.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                if (detection.id == 24) {
+                    hallucination = detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES);
+                    if (hallucination < 90 && hallucination > 0) {
+                        pinpoint.setPosition(new Pose2D(
+                                DistanceUnit.MM,
+                                detection.robotPose.getPosition().x,
+                                detection.robotPose.getPosition().y,
+                                AngleUnit.DEGREES,
+                                star_AntiDelusion(true, hallucination)));
+                    }
                 }
-            }
-            if (detection.id == 20) {
-                hallucination = detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES);
-                if (hallucination < 0 && hallucination > -90) {
-                    pinpoint.setPosition(new Pose2D(
-                            DistanceUnit.MM,
-                            detection.robotPose.getPosition().x,
-                            detection.robotPose.getPosition().y,
-                            AngleUnit.DEGREES,
-                            star_AntiDelusion(false, hallucination)));
+                if (detection.id == 20) {
+                    hallucination = detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES);
+                    if (hallucination < 0 && hallucination > -90) {
+                        pinpoint.setPosition(new Pose2D(
+                                DistanceUnit.MM,
+                                detection.robotPose.getPosition().x,
+                                detection.robotPose.getPosition().y,
+                                AngleUnit.DEGREES,
+                                star_AntiDelusion(false, hallucination)));
+                    }
                 }
             }
         }
@@ -430,6 +460,9 @@ public class Invokation_of_a_False_Life {
     }
 
     public double findAprilStarBearing(boolean red) {
+        if (just_a_cog) {
+            return 0;
+        }
         hallucination = 0;
         double posX = pinpoint.getPosX(DistanceUnit.INCH);
         List<AprilTagDetection> currentDetections = aprilTPR.getDetections();
