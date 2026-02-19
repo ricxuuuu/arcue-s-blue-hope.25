@@ -86,7 +86,7 @@ public class AUTN_rPX extends LinearOpMode {
                     if (!robot.follower.isBusy()) {
                         actOnTheGut();
                         shootToKill(flickerTime, revTime);
-                        if (shotsFired >= 3) {
+                        if (shotsFired >= 4) {
                             robot.follower.followPath(scoreM, true);
                             pathState = 3;
                             reload();
@@ -97,7 +97,7 @@ public class AUTN_rPX extends LinearOpMode {
                     if (!robot.follower.isBusy()) {
                         actOnTheGut();
                         shootToKill(flickerTime, revTime);
-                        if (shotsFired >= 3) {
+                        if (shotsFired >= 4) {
                             robot.follower.followPath(runAway, true);
                             pathState = 4;
                         }
@@ -219,7 +219,7 @@ public class AUTN_rPX extends LinearOpMode {
         } else if (in && (robot.flickState == Invokation_of_a_False_Life.flickStates.DOWNWARDS)) {
             robot.intake.setPower(0.2);
         } else if (in) {
-            robot.intake.setPower(-0.6);
+            robot.intake.setPower(0);
         } else {
             robot.intake.setPower(0);
         }
@@ -239,16 +239,16 @@ public class AUTN_rPX extends LinearOpMode {
             case START:
                 if (shotsFired < 4 && shotsFired != 0 && (revTime.seconds() > 0.7)) {
                     flickerTime.reset();
-                    robot.flicker.setPosition(0.81); //go up
+                    robot.flicker.setPosition(0.6); //go up
                     robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
                 } else if (shotsFired <= 0 && (revTime.seconds() > 1.7)) {
                     flickerTime.reset();
-                    robot.flicker.setPosition(0.81); //go up
+                    robot.flicker.setPosition(0.6); //go up
                     robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
                 }
                 break;
             case UPWARDS:
-                if (flickerTime.seconds() >= 0.135) {
+                if (flickerTime.seconds() >= 0.144) {
                     flickerTime.reset();
                     robot.flicker.setPosition(0); //go down
                     robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
