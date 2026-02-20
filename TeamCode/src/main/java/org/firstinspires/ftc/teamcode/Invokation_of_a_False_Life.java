@@ -224,10 +224,10 @@ public class Invokation_of_a_False_Life {
         double br = (axial + lateral - yaw);
 
         if (the_light_at_the_end_of_the_tunnel) {
-            fl = fl * 0.333;
-            bl = bl * 0.333;
-            fr = fr * 0.333;
-            br = br * 0.333;
+            fl = fl * 0.613;
+            bl = bl * 0.613;
+            fr = fr * 0.613;
+            br = br * 0.613;
         }
 
         // Normalize wheel powers

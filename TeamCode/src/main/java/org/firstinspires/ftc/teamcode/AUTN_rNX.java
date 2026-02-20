@@ -20,7 +20,7 @@ public class AUTN_rNX extends LinearOpMode {
     private final Pose grabT = new Pose(127,84,Math.toRadians(0));
     private final Pose CTRLgT = new Pose(54,75,Math.toRadians(0));
     private final Pose grabM = new Pose(133,57,Math.toRadians(0));
-    private final Pose CTRLgM = new Pose(54,53.1,Math.toRadians(0));
+    private final Pose CTRLgM = new Pose(60,45.1,Math.toRadians(0));
     private final Pose CTRLrM = new Pose(111,55,Math.toRadians(57));
     private final Pose openGate = new Pose(129, 74, Math.toRadians(90));
     private final Pose ctrlGate = new Pose(120, 79, Math.toRadians(90));
@@ -79,6 +79,7 @@ public class AUTN_rNX extends LinearOpMode {
                     break;
                 case 1:
                     if (!robot.follower.isBusy()) {
+                        actOnTheGut(revTime);
                         shootToKill(flickerTime, revTime);
                         if (shotsFired >= 4) {
                             robot.follower.followPath(scoreM, true);
@@ -89,6 +90,7 @@ public class AUTN_rNX extends LinearOpMode {
                     break;
                 case 2:
                     if (!robot.follower.isBusy()) {
+                        actOnTheGut(revTime);
                         shootToKill(flickerTime, revTime);
                         if (shotsFired >= 4) {
                             robot.follower.followPath(runAway, true);
@@ -219,6 +221,19 @@ public class AUTN_rNX extends LinearOpMode {
             robot.intake.setPower(0);
         }
     }
+
+    private void actOnTheGut(ElapsedTime revTime) {
+        if (!robot.follower.isBusy()) {
+            if (robot.flywheel.getPower() != 1) {
+                robot.setFlywheelPower(1);
+                revTime.reset();
+            }
+            intuition = robot.findAprilStarBearing(true); // remove this if bad, works w/o
+            if (Math.abs(intuition) > 4) {
+                robot.follower.turn(intuition, true);
+            }
+        }
+    } //experimental
 
 
     private void shootToKill(ElapsedTime flickerTime, ElapsedTime revTime) {

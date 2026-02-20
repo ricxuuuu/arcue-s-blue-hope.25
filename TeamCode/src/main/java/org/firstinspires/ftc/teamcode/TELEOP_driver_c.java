@@ -239,7 +239,7 @@ public class TELEOP_driver_c extends LinearOpMode {
                         }
                         break;
                     case UPWARDS:
-                        if (flickerTime.seconds() >= 0.147 ) {
+                        if (flickerTime.seconds() >= 0.147) {
                             flickerTime.reset();
                             robot.flicker.setPosition(0); //go down
                             robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
