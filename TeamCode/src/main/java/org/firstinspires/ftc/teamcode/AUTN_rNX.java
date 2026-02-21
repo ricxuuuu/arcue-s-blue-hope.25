@@ -22,6 +22,8 @@ public class AUTN_rNX extends LinearOpMode {
     private final Pose grabM = new Pose(133,57,Math.toRadians(0));
     private final Pose CTRLgM = new Pose(54,53.1,Math.toRadians(0));
     private final Pose CTRLrM = new Pose(111,55,Math.toRadians(57));
+    private final Pose openGate = new Pose(129, 74, Math.toRadians(90));
+    private final Pose ctrlGate = new Pose(120, 79, Math.toRadians(90));
     private final Pose leave = new Pose(96, 120, Math.toRadians(25));
 
     private PathChain scoreT, scoreM, runAway;
@@ -59,7 +61,7 @@ public class AUTN_rNX extends LinearOpMode {
         robot.hood.setPosition(0);  //CLOSE ZONE HOOD ADJUST
         robot.setFlywheelPower(0.71);
         revTime.reset();
-        sleep(888);      //CLOSE ZONE HOOD ADJUST
+        sleep(777);      //CLOSE ZONE HOOD ADJUST
         //||||||||||||||||||||||||||||||||||||||//
 
         //----------------------------------------------------------------------------------------
@@ -77,9 +79,8 @@ public class AUTN_rNX extends LinearOpMode {
                     break;
                 case 1:
                     if (!robot.follower.isBusy()) {
-                        actOnTheGut();
                         shootToKill(flickerTime, revTime);
-                        if (shotsFired >= 3) {
+                        if (shotsFired >= 4) {
                             robot.follower.followPath(scoreM, true);
                             pathState = 2;
                             reload();
@@ -88,9 +89,8 @@ public class AUTN_rNX extends LinearOpMode {
                     break;
                 case 2:
                     if (!robot.follower.isBusy()) {
-                        actOnTheGut();
                         shootToKill(flickerTime, revTime);
-                        if (shotsFired >= 3) {
+                        if (shotsFired >= 4) {
                             robot.follower.followPath(runAway, true);
                             pathState = 3;
                         }
@@ -110,7 +110,6 @@ public class AUTN_rNX extends LinearOpMode {
             //-----------------------------------------------UPDATES
             manageCalories();
             flightEnergyConservation(revTime);
-            actOnTheGut();
             robot.follower.update();
             robot.pinpoint.update();
             //-----------------------------------------------UPDATES
@@ -172,6 +171,8 @@ public class AUTN_rNX extends LinearOpMode {
         scoreT = robot.follower.pathBuilder()
                 .addPath(new BezierCurve(startPose, CTRLgT, grabT))
                 .setLinearHeadingInterpolation(startPose.getHeading(), grabT.getHeading())
+                .addPath(new BezierCurve(grabT, ctrlGate, openGate))
+                .setLinearHeadingInterpolation(grabT.getHeading(), openGate.getHeading())
                 .addPath(new BezierLine(grabT, shootPose))
                 .setLinearHeadingInterpolation(grabT.getHeading(), shootPose.getHeading())
                 .build();
@@ -191,8 +192,8 @@ public class AUTN_rNX extends LinearOpMode {
 
     private void flightEnergyConservation(ElapsedTime revTime) {
         if (robot.follower.isBusy()) {
-            robot.setFlywheelPower(0);
-        } else if (robot.flywheel.getPower() == 0){
+            robot.setFlywheelPower(0.13);
+        } else if (robot.flywheel.getPower() == 0.13){
             if (pathState == 0) {
                 robot.setFlywheelPower(0.71);
             } else {
@@ -213,36 +214,28 @@ public class AUTN_rNX extends LinearOpMode {
         } else if (in && (robot.flickState == Invokation_of_a_False_Life.flickStates.DOWNWARDS)) {
             robot.intake.setPower(0.2);
         } else if (in) {
-            robot.intake.setPower(-0.6);
+            robot.intake.setPower(0);
         } else {
             robot.intake.setPower(0);
         }
     }
 
-    private void actOnTheGut() {
-        if (!robot.follower.isBusy()) {
-            intuition = robot.findAprilStarBearing(false);
-            if (Math.abs(intuition) > 4) {
-                robot.follower.turn(intuition, true);
-            }
-        }
-    } //experimental
 
     private void shootToKill(ElapsedTime flickerTime, ElapsedTime revTime) {
         switch (robot.flickState) {
             case START:
                 if (shotsFired < 4 && shotsFired != 0 && (revTime.seconds() > 0.5)) {
                     flickerTime.reset();
-                    robot.flicker.setPosition(0.81); //go up
+                    robot.flicker.setPosition(0.6); //go up
                     robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
                 } else if (shotsFired <= 0 && (revTime.seconds() > 1)) {
                     flickerTime.reset();
-                    robot.flicker.setPosition(0.81); //go up
+                    robot.flicker.setPosition(0.5); //go up
                     robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
                 }
                 break;
             case UPWARDS:
-                if (flickerTime.seconds() >= 0.135) {
+                if (flickerTime.seconds() >= 0.144 && shotsFired > 0 || flickerTime.seconds() >= 0.3 && shotsFired == 0) {
                     flickerTime.reset();
                     robot.flicker.setPosition(0); //go down
                     robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
@@ -256,9 +249,9 @@ public class AUTN_rNX extends LinearOpMode {
                 }
                 break;
             case MOONLIGHT:
-                if ((shotsFired < 2) && (flickerTime.seconds() >= 0.555)) {
+                if ((shotsFired < 2) && (flickerTime.seconds() >= 0.333)) {
                     robot.flickState = Invokation_of_a_False_Life.flickStates.START;
-                } else if ((shotsFired >= 2) && (flickerTime.seconds() >= 1.3)) {
+                } else if ((shotsFired >= 2) && (flickerTime.seconds() >= 0.8)) {
                     robot.flickState = Invokation_of_a_False_Life.flickStates.START;
                 }
                 break;

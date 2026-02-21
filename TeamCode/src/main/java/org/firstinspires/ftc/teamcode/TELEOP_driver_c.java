@@ -8,8 +8,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.robotcore.internal.camera.CameraState;
-import org.firstinspires.ftc.vision.VisionPortal;
 
 //⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⢻⣿⣿⣿⡿⠙⠉⣉⡉⠉⠉⠉⠉⠉⠉⣉⡉⠉⠛⢯⣍⠉⠉⠉⠙⢟⡋⢉⣽⣿⣿⣏⠉⠉⠉⠉⢉⣉⣉⣉⣉⣉⡉⠭⠭⠭⠭
 //⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠳⡄⠀⠀⠀⠀⠀⢸⡼⠟⠁⠀⣠⣾⡿⠀⢀⣤⡀⠀⠀⢶⣿⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⡿⠃⠙⢷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -200,7 +198,7 @@ public class TELEOP_driver_c extends LinearOpMode {
                 }
                 robot.visionPortal.setProcessorEnabled(robot.aprilTPR, false);
                 robot.just_a_cog = true;
-                gamepad1.rumble(0.7, 0.7, 777);
+                gamepad1.rumble(1, 1, 1333);
             }
             if (gamepad1.optionsWasPressed()) {
                 robot.the_light_at_the_end_of_the_tunnel = !robot.the_light_at_the_end_of_the_tunnel;
@@ -314,6 +312,7 @@ public class TELEOP_driver_c extends LinearOpMode {
             telemetry.addData("| VISION > SEEN/DECIMATION/FPS", "%d / %d / %.1f", robot.aprilTPR.getDetections().size(), robot.currentDecimation, robot.visionPortal.getFps());
             telemetry.addData(">>> || I was wrong. You're not greedy... You're bat-shit insane!", "omelettes!");
             telemetry.addData("| ALLIANCE / HYPT FROM / GOAL ∠D / RAW ∠D", "%s / %.1f / %.1f / %.1f", is_blue_alliance ? "BLUE" : "RED", robot.findGoalDistance(is_blue_alliance), robot.findGoalHeading(is_blue_alliance), robot.hallucination);
+            telemetry.addData("| im so tireddddddddd", "");
             telemetry.update();
             //-----------------------------------------------TELEMETRY
         }

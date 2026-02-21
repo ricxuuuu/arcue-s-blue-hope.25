@@ -14,15 +14,16 @@ public class AUTN_bPX extends LinearOpMode {
     //|||||||||||||||||||||||||||||||// ✧ >.<  //summon a false life to do our bidding
 
     //-----------------------------------------------poses
-    private final Pose startPose = new Pose(56.22,8.35, Math.toRadians(90));
+    private final Pose startPose = new Pose(55.44,8.85, Math.toRadians(90));
     private final Pose shootPose = new Pose(57.4,15.7,Math.toRadians(113));
     private final Pose approachMPose = new Pose(48,53,Math.toRadians(180));
     private final Pose pickupMPose = new Pose(13,51,Math.toRadians(180));
     private final Pose approachBPose = new Pose(48,34.7,Math.toRadians(180));
     private final Pose pickupBPose = new Pose(13,34.7,Math.toRadians(180));
-    private final Pose leave = new Pose(24, 24, Math.toRadians(180));
+    private final Pose pickupHPose = new Pose(10, 13, Math.toRadians(180));
+    private final Pose leave = new Pose(24, 24, Math.toRadians(0));
 
-    private PathChain scorePre ,scoreB, scoreM, runAway;
+    private PathChain scorePre ,scoreB, scoreM, scoreH, runAway;
     int pathState = 0;
     int shotsFired = 0;
     boolean in = false;
@@ -56,7 +57,7 @@ public class AUTN_bPX extends LinearOpMode {
         //||||||||||||||||||||||||||||||||||||||//
         robot.hood.setPosition(1);  //FAR ZONE HOOD ADJUST
         //robot.setFlywheelPower(1);
-        sleep(888);      //FAR ZONE HOOD ADJUST
+        sleep(777);      //FAR ZONE HOOD ADJUST
         //||||||||||||||||||||||||||||||||||||||//
 
         //----------------------------------------------------------------------------------------
@@ -73,7 +74,7 @@ public class AUTN_bPX extends LinearOpMode {
                         revTime.reset();
                     }
                     if (!robot.follower.isBusy()) {
-                        actOnTheGut();
+                        actOnTheGut(revTime);
                         shootToKill(flickerTime, revTime);
                         if (shotsFired >= 4) {
                             robot.follower.followPath(scoreB, true);
@@ -84,9 +85,9 @@ public class AUTN_bPX extends LinearOpMode {
                     break;
                 case 2:
                     if (!robot.follower.isBusy()) {
-                        actOnTheGut();
+                        actOnTheGut(revTime);
                         shootToKill(flickerTime, revTime);
-                        if (shotsFired >= 3) {
+                        if (shotsFired >= 4) {
                             robot.follower.followPath(scoreM, true);
                             pathState = 3;
                             reload();
@@ -95,15 +96,26 @@ public class AUTN_bPX extends LinearOpMode {
                     break;
                 case 3:
                     if (!robot.follower.isBusy()) {
-                        actOnTheGut();
+                        actOnTheGut(revTime);
                         shootToKill(flickerTime, revTime);
-                        if (shotsFired >= 3) {
-                            robot.follower.followPath(runAway, true);
+                        if (shotsFired >= 4) {
+                            robot.follower.followPath(scoreH, true);
                             pathState = 4;
+                            reload();
                         }
                     }
                     break;
                 case 4:
+                    if (!robot.follower.isBusy()) {
+                        actOnTheGut(revTime);
+                        shootToKill(flickerTime, revTime);
+                        if (shotsFired >= 2) {
+                            robot.follower.followPath(runAway, true);
+                            pathState = 5;
+                        }
+                    }
+                    break;
+                case 5:
                     if (!robot.follower.isBusy()) {
                         pathState = -999;
                     }
@@ -117,7 +129,6 @@ public class AUTN_bPX extends LinearOpMode {
             //-----------------------------------------------UPDATES
             manageCalories();
             flightEnergyConservation(revTime);
-            actOnTheGut();
             robot.follower.update();
             robot.pinpoint.update();
             //-----------------------------------------------UPDATES
@@ -140,39 +151,39 @@ public class AUTN_bPX extends LinearOpMode {
     }
 
     /*----------------------------------------------------------------------------------------------
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣬⢟⡛⠍⠉⠉⠙⠻⢵⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⣖⣶⣲⣠⡄⣀⠚⠛⠻⢷⣾⡀⠀⠀⠀⠘⢆⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣄⠟⡋⠅⠀⠀⠀⠀⠉⠑⠲⢥⣲⡄⠙⣝⣆⠀⠀⠀⠈⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⢀⣄⣠⣀⣄⣠⣀⣄⣠⢄⣠⡄⣤⣠⢤⡤⣤⡤⢤⡤⠤⠤⢤⣤⣤⣾⠥⠖⠒⠋⠉⠉⠉⠙⠒⠦⣄⠀⠈⠛⣗⡿⣺⡀⠀⠀⠀⡟⠧⠤⠤⠤⠤⠤⠤⠤⢤⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⡋⠁⠀⠀⣀⠠⠤⠄⠒⠒⠀⠀⠀⠀⠙⢦⡀⠈⢧⡽⠀⠀⣀⡼⠃⠀⠀⠀⠀⠀⠀⠀⠀⢸⡀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠉⢀⠌⣠⠔⠊⠉⠀⠀⡀⠄⠂⠉⠀⠀⠀⠀⠀⠀⠑⠄⢈⠠⠔⣚⠓⠶⣤⡀⠀⠀⠀⠀⠀⠀⠀⢈⡇⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⢔⠕⠀⢰⡥⠊⠀⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⡀⠀⠈⠊⠐⠢⢍⠳⣄⠀⠀⠀⠀⠀⠈⡇⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠂⡀⠀⠀⠀⠀⡠⡣⢊⠐⡼⠣⠀⠀⠀⠀⡠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⡀⠀⠀⠈⠢⠀⠑⢆⠙⠦⣤⣠⣤⡴⣷⡀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠘⠄⠀⠀⡸⢣⢣⢘⡼⠀⠀⠀⠀⠀⢠⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠃⠀⠀⠣⡀⠀⠀⠀⠀⣼⡃⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⢿⡦⣄⡴⡡⢇⢣⡞⠀⠀⠀⠀⡐⢡⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠑⡀⠢⡀⣴⡗⠁⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣯⡗⣯⣳⢴⣙⡮⠏⠀⠀⠀⠀⠀⢀⠇⠀⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠰⡀⠹⣽⡀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⡩⢉⡉⠉⠁⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀⠀⠔⠀⠀⠀⠀⠀⠀⠀⡄⡆⠀⠀⠀⠀⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⢣⠀⢳⢃⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⣄⠀⡉⢉⡴⠂⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠌⠀⠀⠰⠀⠀⠀⠀⠐⢰⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⡄⠈⣿⡄⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣠⠴⣫⣿⠖⠉⠀⠀⠀⠀⠀⠀⢀⡇⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⣼⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢣⠀⢹⡇⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⢧⢰⡺⠶⠒⠚⠉⠀⠀⠀⠀⠀⠀⠠⣀⣠⠞⡇⠀⠀⠀⠀⠀⠀⠀⠸⠃⠀⠀⠀⠀⣴⡇⡆⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠈⢆⢸⡕⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠈⠻⢷⣌⡁⠒⠂⠤⠤⠤⠤⠤⢒⣬⡾⠋⠒⢽⡀⠀⠀⠀⠀⠀⠀⣯⠀⠀⠀⡠⣪⠏⣧⢡⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⣆⠀⠀⠀⠈⢾⣧⣄⡀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣉⠽⡟⠒⠶⠤⠴⢒⣿⡫⠋⠀⠀⠀⠀⢣⠀⠀⠀⠀⠀⢰⢸⠀⢀⢔⡵⠏⠄⠼⣆⣆⣀⣀⡀⠀⠀⡀⠀⠀⠀⠀⠀⠀⠰⢉⠒⠠⠄⠀⠈⣹⡿
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⢥⣾⡇⠀⣀⠶⠒⠉⡿⣀⡀⠀⠀⠀⠤⠈⢳⣀⠀⠀⠀⢸⢀⢖⡵⠋⠀⠀⠀⠀⠹⣜⢄⠀⠀⠀⠀⢧⡀⠀⠀⠠⠀⠀⠀⢣⣌⡐⣀⣴⡾⠟⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⢠⠇⠀⠀⠀⢳⡿⠿⣿⣷⣶⣤⣄⣠⠷⣕⠢⢀⡸⢸⡋⠀⠀⢀⣀⠀⠀⠀⠘⢮⡢⡀⠀⠀⠸⡐⢄⠀⠀⢂⠀⠀⠈⢯⡽⠁⡏⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⢸⠈⢄⠀⠀⠘⡆⠀⣷⡹⣞⡭⣿⠏⠛⠒⠛⠶⢤⣘⡇⠀⢀⣤⣬⣀⣀⣀⣀⠀⠑⣞⢄⡀⠀⢳⡀⠑⠢⣀⠢⡀⠀⠈⠳⣤⣥⣀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡴⡀⠘⡇⡆⠀⢦⣄⣀⡙⣄⢳⡽⣎⣷⠟⠀⠀⠀⠀⠀⠀⠈⠉⠀⠈⣿⣛⣟⡻⣿⣿⠿⣝⡾⣉⡚⠑⡒⠓⠦⣀⠀⠁⠊⠂⠄⣀⠀⣨⡿⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡑⠩⠑⢻⡇⠀⠀⣇⠈⠉⠁⠀⠀⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠵⣎⢷⣣⠇⢀⡞⠀⠀⠀⢈⠍⠑⠢⣈⣽⠳⡗⠾⠶⢒⠛⡗⠁⠀⠀
-⠀⣤⣠⢤⡤⣤⢤⣤⠠⠈⢳⢤⠂⠘⢿⡄⠀⠘⢆⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠚⠓⢁⡔⠋⣀⣀⢤⠖⠁⠀⠀⠀⣰⠃⣸⡇⠀⠀⠸⠐⡅⠀⠀⠀
-⠠⠷⣭⢷⣹⢮⡟⠁⢀⠔⡡⠊⠠⢁⠀⢙⣦⡀⠘⣍⠢⣄⡀⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⣹⡣⠊⠀⠀⠀⠀⣰⣣⡼⠋⠀⠀⠀⠀⠀⠃⠀⠀⠀
-⠐⣶⣤⡌⢡⢹⠃⣶⠁⠊⠐⠀⠁⢠⣴⠋⠀⠈⣵⠚⣭⣥⣯⣷⣦⣤⠀⠀⠀⠀⠀⠀⠀⣤⣤⣤⣶⣴⣦⣤⡄⠀⣼⠋⠀⠀⠀⠀⠀⡜⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠴⣉⠻⡵⢎⡀⠈⠙⠓⠛⠛⠋⠉⡴⢲⠴⣪⢴⣛⡶⣝⡾⣾⡽⣿⢿⣷⣶⡶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⡞⠁⠀⠀⠀⢀⡠⠚⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡅⠀⠀⠀
-⠀⢓⡌⠳⣌⢣⠱⡀⠀⠀⢀⣀⠤⠒⠋⠉⠉⠛⠛⠓⠛⠛⠿⠷⠿⠿⣿⠏⠀⣧⠸⣿⣿⣻⢟⢿⣿⣿⣿⣿⣏⣀⣀⣀⡤⠖⠋⠀⠀⠀⠀⠀⠀⠂⠀⠀⠀⠀⠀⠄⠀⠀⠀
-⠀⢣⠜⡱⢌⢆⢣⡑⣠⣞⡣⣤⣀⣀⣀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡀⠀⡼⡆⢿⣫⣵⣿⢸⣿⣿⡿⣣⡿⠋⠀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡁⠀⠀⠀
-⠀⡱⢊⡕⢪⢜⠢⡔⣿⣄⠉⠹⢿⣿⣿⣍⣽⣿⣿⣿⣿⠶⠶⣒⣒⣲⢫⠛⢢⣵⠿⡌⣿⣿⣿⡿⠿⢻⣺⠁⠀⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡄⠀⠀⠀
-⠀⡱⢣⠜⣡⢎⡱⢌⡟⢉⡤⣤⣤⢂⠭⠭⠭⢍⠉⠉⠁⠀⠄⣴⣶⡎⠎⢀⣾⣿⡆⠈⠁⠀⠀⠀⢠⡿⠛⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⠀⠀⠀
-⠀⡱⢃⡞⣡⢎⡴⣂⢧⣥⣞⣛⣓⣶⠦⠤⢥⣼⣿⣿⣯⡳⣄⡈⠻⠵⢀⣾⣟⢾⢃⠀⣀⣀⠠⢔⠿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⢴⣭⡇⠀⠀⠀
-⠀⡱⢋⡴⢣⠞⣴⢫⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣶⣯⣶⣭⣭⣭⣽⣿⠈⣿⣥⣤⣤⣶⣶⣯⣤⡤⠀⠀⠀⢀⣀⠀⠀⠀⠀⢀⣀⣤⣤⣶⢶⣿⢟⣫⣾⣻⢳⡇⠀⠀⠀
-⠀⠑⠉⠲⠉⠚⠤⠋⠬⠧⠽⠽⠛⠟⠿⠟⣛⡟⠛⣿⣿⢿⡻⣟⣻⣻⣿⣿⡷⠿⠿⠿⠏⠙⠒⠓⠒⠄⠀⠀⠒⠛⠒⠶⠛⠿⠿⠿⠝⠚⠓⠚⠳⠲⠯⠷⠛⠶⠿⠀⠀⠀⠀
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠁⡇⠀⠀⠀⠀⠀⠀⠀⠸⣿⡇⠀⠚⠉⣸⣿⣅⣀⠀⠀
+⠙⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢸⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣷⣾⠿⠿⠿⠿⠛⠉⠀⠀
+⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⡎⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠟⠛⠛⠛⠛⠛⠛⢛⠛⠛⠻⠿⠿⠿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⣀⡀⠀⠀⠀⠀⢠⡿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰
+⣿⣿⣿⣿⣿⣿⠿⠛⠛⠉⠉⢀⣤⠞⠋⠀⠀⠀⠀⢀⡤⢀⡤⠚⠁⠀⠀⠀⠀⠀⠀⣠⠴⠂⠀⠈⠉⠉⠛⠻⠿⣿⣿⣿⣿⣿⣿⣿⣶⣤⡀⢀⡟⠁⠀⠀⠀⠀⠀⠀⠀⠀⢀⣼⣿
+⣿⣿⣿⣿⠏⣠⠀⠀⠀⠀⣰⠟⠁⠀⠀⠀⠀⣠⠖⠉⠀⠀⠀⠀⠀⠀⠀⠀⢀⡴⠚⠁⠀⠀⠀⠀⠀⠀⠀⠀⢀⡟⠈⠉⠛⠿⣿⣿⣿⣿⣿⣿⣄⡀⠀⠀⠀⠀⠀⠀⠀⣠⣾⣿⣿
+⣿⣿⣿⢏⡴⠃⠀⠀⢠⡞⠁⠀⣠⠔⠀⣠⢞⣡⠞⠁⠀⠀⠀⠀⠀⠀⢀⡴⠋⠀⠀⠀⠀⠀⠀⠀⣠⠄⠀⡠⢻⠁⠀⠀⠀⠀⠀⠙⠻⢿⣿⣿⣿⣿⣦⡀⠀⠀⠀⢀⣴⣿⣿⠉⠉
+⣿⣿⡷⠋⠀⠀⠀⣰⠋⣀⠴⠋⠀⣠⠞⢡⠟⠁⠀⠀⠀⠀⠀⠀⠀⣠⠞⠁⠀⠀⠀⠀⠀⣀⡴⠊⢁⡴⠊⢁⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠻⣿⣿⣿⣿⣦⡀⣠⣾⣿⡟⠉⠀⢀
+⡿⠏⡀⠀⢀⣠⣾⠷⠋⠁⠀⣠⠞⠁⢠⠏⠀⠀⠀⠀⠀⠀⠀⢀⡼⠃⠀⠀⠀⠀⣀⡴⠚⠁⣠⠔⠋⠀⠀⣸⠁⠀⠀⠀⠀⠀⠀⠀⠀⣀⠀⣸⠁⠙⢿⣿⣿⣿⣿⣿⣿⡀⠀⠀⠃
+⣁⣠⠵⠞⠛⠉⠀⠀⠀⣠⡾⣡⠄⢠⡟⠀⠀⠀⠀⠀⠀⠀⢠⡞⠀⠀⢀⣠⠴⠚⢁⣤⣶⣋⡁⠀⠀⠀⢀⡇⠀⠀⠀⠀⠀⠀⠀⠀⡼⠁⢠⡇⠀⠀⠀⠙⢿⣿⣿⣿⣿⣷⣦⡤⠂
+⠁⠀⠀⠀⠀⢀⣠⢴⡾⣫⣾⠃⢠⣿⠁⠀⠀⠀⠀⠀⡀⢠⣏⡠⠴⢚⣉⠤⠖⠛⠁⠀⠀⠀⠈⠙⠳⠦⣼⠁⠀⠀⠀⠀⠀⠀⠀⡜⠁⢠⢿⡇⠀⡜⢠⠀⠀⠙⢿⣿⣿⣿⣿⠀⠀
+⠀⠀⠀⠀⢠⠞⢁⣞⡽⢡⡏⠀⡞⡞⠀⠀⠀⠀⠀⠀⢷⣿⠵⠒⣯⡉⠀⢠⡄⠤⠤⠤⣀⣀⠀⠀⠀⠀⡾⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⡟⢸⠁⠀⠀⡟⢠⢀⠀⡀⠻⣿⣿⣿⣷⣾
+⠀⠀⠀⠀⠀⢀⣾⡿⠁⣼⠀⢸⢡⡇⠀⠀⠀⠀⠀⠀⡞⣿⣿⡿⠿⠿⠿⠿⠿⣿⣿⣶⣤⣄⠉⠳⣄⡀⡇⠀⠀⠀⠀⠀⠀⠀⡼⣲⠋⡇⢸⠀⠀⢰⠃⡆⢸⢠⢹⠀⠙⣿⣿⣿⡏
+⠀⠀⢀⣠⠴⠛⡿⣧⣴⡏⠀⡏⢸⠇⠀⠀⠀⠀⠀⢸⠁⢹⡇⠀⠀⣠⠖⢻⣟⠲⢮⡙⢿⣿⡗⢆⠘⡅⡇⠀⠀⠀⠀⠀⢀⡞⣰⠇⠀⣷⢸⠀⠀⣾⠀⢧⠈⣿⢸⢠⠀⠸⣿⣿⣿
+⣶⣚⣉⠤⠤⠾⣧⠘⣇⣷⠀⠃⢸⡀⠀⠀⠀⠀⠀⣿⠀⠘⡇⠀⡾⠥⠞⠉⠁⠹⣾⣷⠀⠘⢿⡌⠀⢹⡇⠀⠀⠀⠀⠀⡼⢠⠏⠉⠛⢿⣼⠀⢰⣇⠀⠘⠦⣿⠀⢿⠀⠀⢿⣿⣿
+⠀⠀⠀⠀⠀⢀⢿⣦⡈⠻⣇⠀⠸⡇⠀⠀⠀⠀⠀⣿⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⢸⣼⠀⠀⠈⠧⠀⠀⡇⠀⠀⠀⠀⢸⢣⡏⠀⠀⠀⢸⣿⠀⢸⢻⠀⠀⢸⣿⡀⠈⠐⡆⢸⣿⣿
+⠀⠀⠀⠀⠀⠁⢈⣯⢳⣄⠘⡄⠀⢷⠀⠀⠀⢸⡀⢹⡀⠀⠀⠀⠹⠤⣀⡀⠀⠀⢀⡟⠀⠀⠀⠀⠀⠀⣷⠀⠀⢰⠂⡏⡾⠀⠀⣀⠀⠀⣿⡇⡾⣾⡄⠀⢸⠃⠃⠀⠀⣧⢸⣿⣿
+⠀⠀⠀⠀⠀⣠⠞⢈⣿⡉⠛⣿⣆⠘⣆⠀⠀⠀⢳⡀⢷⡀⠀⠀⠀⠀⠀⠉⠓⠚⠉⠀⠀⠀⠀⠀⠀⠀⢸⡄⠀⢸⣶⣿⠇⣀⡬⢭⣉⠲⣼⣇⡇⠘⡇⢐⡿⠀⠀⠀⢰⡟⢸⣿⣿
+⢦⣀⠀⣠⣾⠏⢀⣾⣿⡇⠀⣿⢯⣧⣘⢦⡀⠀⠀⢻⣦⣳⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣧⠀⢸⢻⣿⣴⣾⣿⡿⢿⣷⣌⢿⡇⠀⣧⣼⠁⠀⠀⠀⣼⡇⣸⣿⣿
+⡄⠈⠛⠳⠧⣤⣾⠿⠋⠀⠀⡿⠈⢣⡘⣿⠿⠦⣤⣬⡄⠈⠙⠛⠛⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡆⢿⠈⣿⡯⠿⠳⣝⣦⠙⣿⡾⠃⠀⣿⠃⠀⠀⠀⢠⡿⢡⣿⣿⣿
+⠛⠷⣤⡀⠀⠀⠀⠀⠀⠀⣰⠇⡇⠀⢳⡘⢦⠀⠀⠀⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢳⣸⡾⠁⠱⠄⠀⢻⣿⠀⠸⣿⣖⡾⠃⠀⠀⠀⠀⡼⢣⣾⣿⣿⣿
+⠀⠀⠈⠛⢶⣤⣤⣤⠤⢾⣿⡄⢡⠀⠀⠙⣎⢳⡀⠀⢸⡄⠀⠀⠀⠀⢀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣿⣄⠀⢀⡐⢻⡟⠀⢠⣿⡿⠷⠄⠀⢀⣠⢞⣵⠿⣿⣟⢻⣿
+⣦⡀⠀⠀⠀⢻⣿⣦⣴⠋⡏⣇⠘⢧⡀⠀⣏⣷⣽⣦⣄⠹⣄⠀⠀⢀⡟⠃⠈⠉⠹⠗⠢⣄⡀⠀⠀⠀⠀⠀⠀⠀⠙⠻⠷⢤⠤⠊⢀⣴⡿⠋⢀⡼⠒⠚⠿⠚⢋⡇⠘⣿⠻⣿⣿
+⢹⣿⣦⡀⠀⠀⠹⣿⣿⠀⠹⣼⡄⠈⠛⡄⢹⣼⡈⢿⠈⠙⠛⠓⠒⠘⡇⠀⠀⠀⠀⠀⠈⠲⡍⠳⢄⡀⠀⠀⠀⠀⠀⠀⠀⠠⢄⣤⣖⣋⣤⢶⡿⠁⠀⠀⢀⡾⣸⠀⠀⣏⠀⠙⣟
+⠀⠈⢿⡷⣄⠀⠀⢿⣿⣧⠀⠹⣧⠀⠀⠃⠆⢿⣧⠈⠀⠀⠀⠀⠀⠀⢣⠀⠀⠀⠀⠀⠀⠀⠈⠆⠀⠹⡄⠀⠀⠀⠀⠀⠀⠀⠀⣰⢿⣟⡵⠋⠀⠀⠀⢀⣾⠁⡟⠀⠀⣿⡀⠀⢈
+⠀⢀⣽⣧⠈⢷⡀⠸⡎⢻⣷⡀⠘⢧⡀⠀⠀⠸⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡼⠁⠀⠀⠀⢠⣀⠀⢀⣾⣿⠿⠋⠀⠀⠀⠀⣠⣟⣽⣸⠁⠀⠀⣿⡇⠀⠀
+⡁⠊⢿⣿⠀⠀⠙⡄⢷⠀⠙⣿⣦⡈⠛⣦⡀⠀⠹⣿⢧⡀⠀⠀⠀⠀⠀⠀⠀⠀⠠⣄⣀⣠⠤⠚⠉⠀⠀⠀⠀⠀⠀⠙⣿⣭⡉⠀⠀⠀⢀⣠⣴⣿⣿⣿⣿⡏⠀⠀⢸⣿⡇⠀⠐
+⣶⣿⣿⣿⡆⠀⠀⡀⢸⡆⠀⠈⢻⣿⣦⡀⠙⢦⣀⢻⡀⠹⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⢾⠁⢸⢹⠙⠛⢉⠹⣿⣿⣿⣿⣿⣿⣆⠀⠀⣾⡇⢹⠀⠀
+⣿⣿⣿⣿⡇⠀⠀⣷⠀⡇⠀⢀⡀⢿⣿⣿⣦⡀⠙⠻⣿⣆⠈⢷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣤⠴⠚⠋⠀⢸⠀⣿⠘⡆⠀⢠⢸⣿⢿⣿⣿⣿⠿⣿⣆⣾⡟⠀⢸⠀⡇
+⣿⣿⣿⣿⡇⠀⠀⡟⠀⣷⠀⡾⠀⠘⣿⣿⣿⣷⡄⠀⠈⠻⣧⡀⣹⡷⢤⣀⣤⡤⠶⠶⠞⠛⠋⠉⠉⠁⢀⠀⠀⠀⠀⢸⠀⣿⠀⢱⡀⣘⢸⢘⣿⣿⣿⡋⠄⠿⢿⣯⠀⠀⣼⡐⢳
+⣿⣿⣿⣿⡇⠀⢀⡇⠀⢺⠀⡇⠀⠀⢻⣿⣿⣿⣿⡀⠀⠀⠈⠻⣿⣷⣾⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡀⠀⠀⠀⢸⠀⡇⠀⠀⢳⡈⢹⡉⠸⡽⣜⣧⠀⠀⠀⠙⢷⡀⠻⠒⠋
+⣿⣿⣿⣿⣧⠀⣸⠁⠀⢸⢸⠃⠀⠀⢸⣿⣿⣿⣿⣷⠀⠀⠀⢀⡘⣿⣿⡿⠳⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠃⠀⠀⠀⠈⡇⣧⠀⠀⠀⠹⣌⢧⠀⢳⠙⣎⢷⡀⠀⠀⠈⠻⣄⠀⠀
+⣿⣿⣿⣿⡿⢀⡏⠀⠀⣼⣾⠀⠀⠀⠈⣿⣿⣿⣿⣿⣇⠀⠀⠀⠙⠞⢞⢿⣖⣿⣷⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢳⢻⡀⠀⠀⠀⠈⠻⣷⣤⣧⠘⢯⣳⣄⠀⠀⠀⠙⢧⡀
  -------------------------------------------------------------------------------------------------*/
 
     private void buildPaths() {
@@ -199,6 +210,13 @@ public class AUTN_bPX extends LinearOpMode {
                 .setLinearHeadingInterpolation(pickupMPose.getHeading(), shootPose.getHeading())
                 .build();
 
+        scoreH = robot.follower.pathBuilder()
+                .addPath(new BezierLine(shootPose, pickupHPose))
+                .setLinearHeadingInterpolation(shootPose.getHeading(), pickupHPose.getHeading())
+                .addPath(new BezierLine(pickupHPose, shootPose))
+                .setLinearHeadingInterpolation(pickupHPose.getHeading(), shootPose.getHeading())
+                .build();
+
         runAway = robot.follower.pathBuilder()
                 .addPath(new BezierLine(shootPose, leave))
                 .setTangentHeadingInterpolation()
@@ -207,8 +225,8 @@ public class AUTN_bPX extends LinearOpMode {
 
     private void flightEnergyConservation(ElapsedTime revTime) {
         if (robot.follower.isBusy()) {
-            robot.setFlywheelPower(0);
-        } else if (robot.flywheel.getPower() == 0){
+            robot.setFlywheelPower(0.13);
+        } else if (robot.flywheel.getPower( ) == 0.13 && pathState != -999){
             robot.setFlywheelPower(1);
             revTime.reset();
         }
@@ -220,15 +238,19 @@ public class AUTN_bPX extends LinearOpMode {
         } else if (in && (robot.flickState == Invokation_of_a_False_Life.flickStates.DOWNWARDS)) {
             robot.intake.setPower(0.2);
         } else if (in) {
-            robot.intake.setPower(-0.6);
+            robot.intake.setPower(0);
         } else {
             robot.intake.setPower(0);
         }
     }
 
-    private void actOnTheGut() {
+    private void actOnTheGut(ElapsedTime revTime) {
         if (!robot.follower.isBusy()) {
-            intuition = robot.findAprilStarBearing(false);
+            if (robot.flywheel.getPower() != 1) {
+                robot.setFlywheelPower(1);
+                revTime.reset();
+            }
+            intuition = robot.findAprilStarBearing(false); // remove this if bad, works w/o
             if (Math.abs(intuition) > 4) {
                 robot.follower.turn(intuition, true);
             }
@@ -238,18 +260,18 @@ public class AUTN_bPX extends LinearOpMode {
     private void shootToKill(ElapsedTime flickerTime, ElapsedTime revTime) {
         switch (robot.flickState) {
             case START:
-                if (shotsFired < 4 && shotsFired != 0 && (revTime.seconds() > 0.7)) {
+                if (shotsFired < 4 && shotsFired != 0 && (revTime.seconds() > 0.5)) {
                     flickerTime.reset();
-                    robot.flicker.setPosition(0.81); //go up
+                    robot.flicker.setPosition(0.6); //go up
                     robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
-                } else if (shotsFired <= 0 && (revTime.seconds() > 1.7)) {
+                } else if (shotsFired <= 0 && (revTime.seconds() > 1)) {
                     flickerTime.reset();
-                    robot.flicker.setPosition(0.81); //go up
+                    robot.flicker.setPosition(0.5); //go up
                     robot.flickState = Invokation_of_a_False_Life.flickStates.UPWARDS;
                 }
                 break;
             case UPWARDS:
-                if (flickerTime.seconds() >= 0.135) {
+                if (flickerTime.seconds() >= 0.144 && shotsFired > 0 || flickerTime.seconds() >= 0.3 && shotsFired == 0) {
                     flickerTime.reset();
                     robot.flicker.setPosition(0); //go down
                     robot.flickState = Invokation_of_a_False_Life.flickStates.DOWNWARDS;
@@ -263,9 +285,9 @@ public class AUTN_bPX extends LinearOpMode {
                 }
                 break;
             case MOONLIGHT:
-                if ((shotsFired < 2) && (flickerTime.seconds() >= 0.555)) {
+                if ((shotsFired < 2) && (flickerTime.seconds() >= 0.333)) {
                     robot.flickState = Invokation_of_a_False_Life.flickStates.START;
-                } else if ((shotsFired >= 2) && (flickerTime.seconds() >= 1.3)) {
+                } else if ((shotsFired >= 2) && (flickerTime.seconds() >= 0.8)) {
                     robot.flickState = Invokation_of_a_False_Life.flickStates.START;
                 }
                 break;

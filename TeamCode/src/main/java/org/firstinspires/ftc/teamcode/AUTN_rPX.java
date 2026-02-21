@@ -57,7 +57,7 @@ public class AUTN_rPX extends LinearOpMode {
         //||||||||||||||||||||||||||||||||||||||//
         robot.hood.setPosition(1);  //FAR ZONE HOOD ADJUST
         //robot.setFlywheelPower(1);
-        sleep(888);      //FAR ZONE HOOD ADJUST
+        sleep(777);      //FAR ZONE HOOD ADJUST
         //||||||||||||||||||||||||||||||||||||||//
 
         //----------------------------------------------------------------------------------------
@@ -250,7 +250,7 @@ public class AUTN_rPX extends LinearOpMode {
                 robot.setFlywheelPower(1);
                 revTime.reset();
             }
-            intuition = robot.findAprilStarBearing(false);
+            intuition = robot.findAprilStarBearing(true); // remove this if bad, works w/o
             if (Math.abs(intuition) > 4) {
                 robot.follower.turn(intuition, true);
             }
